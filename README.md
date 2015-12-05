@@ -157,7 +157,7 @@ btn.addEventListener("click", function() {
 }, false);
 ```
 
-When using <code>addEventListener</code> from the DOM API, the context of <code>this</code> in the event handler is set as the element the event was triggered from. This is an extremely convenient design choice as often in an event handler you will need a reference to the trigger element to perform an update or retrieve a value. 
+When using <code>addEventListener</code> from the DOM API, the context of <code>this</code> in the event handler is set as the element the event was triggered from. This is an extremely convenient design choice as often in an event handler you will need a reference to the trigger element to perform an update or retrieve a value. To understand how context is organically determined take the following example:
 
 ```javascript
 function bar() {
@@ -184,4 +184,21 @@ foo.b();
 ```
 
 Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a variable <code>a</code> declared within it. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and <code>a</code> is looked up against this call site and not the global object as it was previously.
+
+When determining context, the default rule is the last to be considered. Other ways of determining context take precedence over the default rule. Take the following example of a constructor function:
+
+```javascript
+function Foo(name) {
+    this.name = name;
+}
+Foo.prototype.sayName = function() {
+  return this.name;
+};
+var foo = new Foo("mike");
+foo.sayName();  // mike
+```
+
+<code>this</code> is a device used to assign properties specific to an instance of a constructor function. In the above we can see that <code>this</code>, when used in a constructor, refers to the instance of that constructor.
+
+The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. 
 

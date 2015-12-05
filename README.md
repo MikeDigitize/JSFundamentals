@@ -143,8 +143,45 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Context
 
+Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context and this reference can be accessed through <code>this</code>. Context can be defined organically or artificially in JavaScript and can be used to great effect when creating coding patterns and APIs. Consider the following example:
 
+```html
+<button id="add" data-value="0">Add 1</button>
+```
 
+```javascript
+var btn = document.querySelector("#add");
+btn.addEventListener("click", function() {
+  var count = this.getAttribute("data-value");
+  this.setAttribute("data-value", ++Number(count));
+}, false);
+```
 
+When using <code>addEventListener</code> from the DOM API, the context of <code>this</code> in the event handler is set as the element the event was triggered from. This is an extremely convenient design choice as often in an event handler you will need a reference to the trigger element to perform an update or retrieve a value. 
 
+```javascript
+function bar() {
+  console.log(this.a);  // "bar"
+}
+var a = "bar";
+bar();
+```
+
+Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variables it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore has a reference to the variable <code>a</code>.
+
+This is known as the default context rule. Be aware however that in strict mode, as this has not been explicitly set, it will throw an error. To see how the default rule changes according to the call site, take the following example:
+
+```javascript
+function bar() {
+  console.log(this.a);  // "foo"
+}
+var a = "bar";
+var foo = {
+  a : "foo",
+  b : bar
+};
+foo.b();
+```
+
+Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a variable <code>a</code> declared within it. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and <code>a</code> is looked up against this call site and not the global object as it was previously.
 

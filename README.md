@@ -1,9 +1,9 @@
 # AOJSGuide
 A guide to JavaScript.
 
-## JavaScript?
+## The JavaScript Compiler
 
-A programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before running it. In this compilation stage the JavaScript engine runs through your code and prepares it for execution, which includes optimising the code to be as fast as possible. It is at this time, during compilation, when scope is defined.
+JavaScript is a programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before its executed. In this compilation stage the JavaScript engine runs through your code and compiles it to machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when scope is defined.
 
 ## Scope
 Scope refers to variable and function scope. When you declare a variable or function in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scoping at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
@@ -174,7 +174,7 @@ bar();
 
 Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variables it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore has a reference to the variable <code>a</code>.
 
-This is known as the default context rule. Be aware however that in strict mode the default context rule is ignored and <code>this</code> will be undefined. Trying to access a property on undefined will throw an error. To see how the default rule changes according to the call site, take the following example:
+This is known as the default context rule. Be aware that in strict mode the default context rule is ignored if the scope is global and <code>this</code> will be undefined. Trying to access a property on undefined obviously will throw an error. To see how the default rule changes according to the call site, take the following example:
 
 ```javascript
 function bar() {
@@ -285,6 +285,27 @@ greetMike();  // Howdy Mike
 
 ```
 
+It is important to note that bind cannot be used directly on function declarations. To use bind you must create a new reference to the bound function. To illustrate this, consider the following:
+
+```javascript
+// syntax error
+function foo() {
+  return this.name;
+}.bind({ name : "foo" });
+
+function foo() {
+  return this.name;
+}
+
+// does nothing as the bound function is not assigned to a nwe variable
+foo.bind({ name : "foo" });
+
+// correct: bar is a reference to the bound function
+var bar = foo.bind({ name : "bar" });
+bar();  // bar
+
+```
+
 ### Fat Arrow functions
 
 ES6 introduced a new syntax for functions, known as fat arrow functions. These functions handle context in a different way to their traditional counterparts. The below example helps illustrate this by first demonstrating how a traditional function declaration handles context. 
@@ -337,3 +358,65 @@ What actually happens behind the scenes is not the same as using bind however. I
 
 ### Summary
 <code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and is set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.
+
+## Closure
+Closures are a concept that all JavaScript developers should understand and utilise in their code. In order to understand closures you must first have a good understanding of lexical scoping. Take the following example:
+
+```javascript
+function bar() {
+  var a = "bar";
+  function foo() {
+    console.log(a);
+  }
+  foo();
+}
+bar();  // a
+
+```
+
+In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When ran, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and log that value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope).
+
+There is nothing revelationary in the above. However, a slight modification of the code can begin to demonstrate the power of closures. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
+
+```javascript
+function foo() {
+    var a = "foo";
+    function bar() {
+        return a;
+    }
+    return bar;
+}
+
+var bar = foo();
+bar();  // foo
+
+```
+
+In this example the function bar is returned from the function foo. The variable <code>a</code> is lexically scoped within foo and any descendant scopes. It is not available outside of the scope of function foo. However, by creating a variable <code>bar</code> in the global scope and assigning it to the return value of foo, when we call that function we have access to <code>a</code>, even though the call is outside of <code>a</code>'s lexical scope.
+
+This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is still accessible at runtime. With this in mind, consider the following piece of code;
+
+```javascript
+function percentage(percent) {
+  return function(value) {
+    return value / 100 * percent;
+  }
+}
+
+var vat = percentage(20);
+vat(30);  // 6
+
+```
+
+The above demonstrates closures in a more practical manner. The function <code>percentage</code> calculates the percentage of a value. The percentage it calculates is determined by the value of the argument it accepts. Its return value however is not the calculated answer - how could it be, at this point there is no value to calculate against - it is a function. It is this function that accepts the value to calculate the percentage of. 
+
+What has happened is the returned function has closed over the scope of percentage. At compilation time the value of percent is undefined, yet it has access to its reference so when that value is defined, when the function is called, it is able to use it in its calculation. This is a powerful technique - often referred to as partial application - and could be used multiple times like in the following example:
+
+```javascript
+var vat = percentage(20);
+vat(30);  // 6
+
+var half = percentage(50);
+half(100);  // 50
+
+```

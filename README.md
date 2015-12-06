@@ -1,12 +1,12 @@
 # AOJSGuide
-An guide to JavaScript
+A guide to JavaScript
 
-## What is JavaScript?
+## JavaScript?
 
 A programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before running it. In this compilation stage a lot happens to your code, including lots of micro optimisations, but the key thing to be aware of for JavaScript developers is that this is the time at which scope is defined.
 
 ## Scope
-Scope refers to variable scope. When you declare a variable in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scoping at the compiler stage. Pre ES6 variables were scoped either to the global scope or to a function scope. 
+Scope refers to variable scope. When you declare a variable in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scoping at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
 
 ```javascript
 // global scope
@@ -30,6 +30,8 @@ function foo() {
 console.log(bar);
 ```
 
+### Variables and functions
+
 When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available externally. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them, which we'll get to shortly.
 
 ```javascript
@@ -43,7 +45,9 @@ var foo = function() {
 
 ```
 
-ES6 introduced two new ways for variables to be declared; <code>const</code> and <code>let</code>. These both have different scoping criteria to var or function. Const and let are block scoped which means they are available only within the block <code>{ }</code> they are declared in.
+### Let and const
+
+ES6 introduced two new ways for variables to be declared <code>const</code> and <code>let</code>. These both have different scoping criteria to var or function. Const and let are block scoped which means they are available only within the block <code>{ }</code> they are declared in.
 
 ```javascript
 for (let i = 0; i < 5l i++) {
@@ -55,7 +59,7 @@ for (let i = 0; i < 5l i++) {
 console.log(i);
 ```
 
-If the above was declared with var it would be available outside of the block. Let and const are also handled differently to var and function by the compiler, which we'll cover shortly.
+In the above, if <code>i</code> was declared with var it would be available outside of the block. Let and const are also handled differently to var and function by the compiler, which will be explained in the next section.
 
 ### Summary
 Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compile stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
@@ -73,7 +77,7 @@ function b() {
 
 ```
 
-The compiler runs through the code and hoists the variables and functions to the top of the parent scope (in this case, global), so when the code is executed at run time it will look like this:
+The compiler runs through the code and hoists the variables and functions to the top of the parent scope (in this case the global scope), so when the code is executed at run time it will look like this:
 
 ```javascript
 
@@ -86,7 +90,7 @@ a = b();
 console.log(a); // foo
 ```
 
-Earlier it was mentioned that function declarations and expressions are treated differently by the compiler. Notice in the above example how the function declaration is hoisted to the top of the scope in its entirety. A function expression would be treated differently. Here's the same example again but using a function expression.
+Function declarations and expressions are treated differently by the compiler. Notice in the above example how the function declaration is hoisted to the top of the scope in its entirety. A function expression would be treated differently. Here's the same example again but using a function expression.
 
 ```javascript
 // pre compiler
@@ -110,7 +114,9 @@ b = function() {
 console.log(a);
 ```
 
-At runtime the above example would attempt to call <code>b</code> as a function before the function is assigned as its value, resulting in an error. 
+At runtime the above example would attempt to call <code>b</code> as a function before the function is assigned as its value, resulting in an error as at that time its value is undefined and therefore cannot be called as a function. 
+
+### Hoisting and let and const
 
 Let and const are not hoisted like var and function. Take the following example:
 
@@ -139,11 +145,11 @@ After the compilation stage the <code>x</code> variable declared with var is hoi
 
 ### Summary
 
-Variables declared with var or function are hoisted to the top of their parent scope. Variables are declared but are not assigned a value. This happens at run time, not compile time. Function declarations however are assigned their value which is the function they represent. Function expressions are not assigned a value and are treated like a variable. Their value is likewise assigned at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in an error. This area before they are assigned a value is known as the temporal dead zone.
+Variables declared with var or function are hoisted to the top of their parent scope. Variables are declared but are not assigned a value. Value assignment happens at run time, not compile time. Function declarations however are assigned their value, which is the function they represent. Function expressions are not assigned a value and are treated like a variable. Their value is assigned at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in an error. This area before they are assigned a value is known as the temporal dead zone.
 
 ## Context
 
-Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context and this reference can be accessed through <code>this</code>. Context can be defined organically or artificially in JavaScript and can be used to great effect when creating coding patterns and APIs. Consider the following example:
+Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context and this reference can be accessed through <code>this</code>. Context can be defined organically or artificially in JavaScript and can be used to great effect in coding patterns and APIs. Consider the following example:
 
 ```html
 <button id="add" data-value="0">Add 1</button>
@@ -157,7 +163,7 @@ btn.addEventListener("click", function() {
 }, false);
 ```
 
-When using <code>addEventListener</code> from the DOM API, the context of <code>this</code> in the event handler is set as the element the event was triggered from. This is an extremely convenient design choice as often in an event handler you will need a reference to the trigger element to perform an update or retrieve a value. To understand how context is organically determined take the following example:
+When using <code>addEventListener</code> from the DOM API, the context of <code>this</code> in the event handler is set as the element the event was triggered from. This is a convenient design choice as often in an event handler you will need a reference to the trigger element. To understand how context is organically determined take the following example:
 
 ```javascript
 function bar() {
@@ -171,7 +177,7 @@ bar();
 
 Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variables it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore has a reference to the variable <code>a</code>.
 
-This is known as the default context rule. Be aware however that in strict mode, as this has not been explicitly set, it will throw an error. To see how the default rule changes according to the call site, take the following example:
+This is known as the default context rule. Be aware however that in strict mode the default context rule is ignored and <code>this</code> will be undefined. Trying to access a property on undefined will throw an error. To see how the default rule changes according to the call site, take the following example:
 
 ```javascript
 function bar() {
@@ -185,7 +191,7 @@ var foo = {
 foo.b();
 ```
 
-Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a variable <code>a</code> declared within it. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and <code>a</code> is looked up against this call site and not the global object as it was previously.
+Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a variable <code>a</code> declared on it. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and <code>a</code> is looked up against this call site and not the global object as it was previously.
 
 When determining context, the default rule is the last to be considered. Other ways of determining context take precedence over the default rule. Take the following example of a constructor function:
 
@@ -206,7 +212,7 @@ The default rule and the constructor are the two organic ways in which context i
 
 ### Call and Apply
 
-On the function constructor's prototype, there are two methods that you can use to explicitly set the context of <code>this</code>: <code>call</code> and <code>apply</code> on any function you declare. Consider the following example:
+On the function constructor's prototype, there are two methods that explicitly set the context of <code>this</code> <code>call</code> and <code>apply</code> on any function you declare. Consider the following example:
 
 ```javascript
 function foo() {
@@ -219,9 +225,9 @@ var obj = {
 foo.call(obj);  // foo
 ```
 
-In the above we have a function foo that returns <code>this.bar</code>. We have a variable <code>bar</code> defined in the global scope. We also have a variable <code>obj</code> which is an object that has a property also called <code>bar</code>. If we were to call foo normally in the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. In the example above however we call the function using <code>call</code>. <code>call</code> and <code>apply</code> allow you to explicilty define the context of <code>this</code> within the function they're attached to. It is set to the first argument either are passed. In the above example we can see foo is called using <code>call</code> and the context is set to the variable <code>obj</code>.
+In the above we have a function foo that returns <code>this.bar</code>. We have a variable <code>bar</code> defined in the global scope. We also have a variable <code>obj</code>; an object with a property also named <code>bar</code>. If we were to call foo normally in the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. In the example above however we call the function using <code>call</code>. <code>call</code> and <code>apply</code> can explicilty define the context of <code>this</code> within the function they're attached to. The context is set to the first argument passed into <code>call</code> and <code>apply</code>. In the above example foo is called using <code>call</code> and the context is set to the variable <code>obj</code>.
 
-The difference between call and apply is in the subsequent parameter(s) they accept. The first argument is set to the context of <code>this</code>, any other parameters are the arguments passed into the function that they are called on. <code>call</code> takes an indefinite amount of comma separated parameters, whilst <code>apply</code> takes a single array of values as its second parameter.
+The difference between call and apply is in the subsequent argument(s) they accept. The first argument becomes the context of <code>this</code>, any other arguments are the arguments passed into the function they are called on. <code>call</code> takes an indefinite amount of comma separated parameters, whilst <code>apply</code> takes a single array of values as its second parameter.
 
 ```javascript
 function add(num1, num2) {
@@ -231,4 +237,21 @@ addTwo.call(null, 5, 2); // 7
 addTwo.apply(null, [5, 2]);  // 7
 ```
 
-Notice how in the example above both call and apply can be used in a non-context based scenario. In the above there is no reference to <code>this</code> so the first argument supplied to both is null, as we're not interested in setting context in this case, we just want to call the function and supply it with arguments.
+Notice how in the example above both call and apply are not being used to set context. In the above there is no reference to <code>this</code> so the first argument supplied to both is null, as we're not interested in setting context in this case, we just want to call the function and supply it with arguments.
+
+### Bind
+
+Bind is another method on the function prototype. The difference between bind and call and apply is that the latter, when used, will run the function they're called on, bind however preloads the function with a context and arguments, but doesn't call it. Consider the following example:
+
+```html
+<button id="add" data-value="0">Add 1</button>
+```
+
+```javascript
+var btn = document.querySelector("#add");
+btn.addEventListener("click", function() {
+  // this is set the btn via bind
+}.bind(btn), false);
+```
+
+The anonymous function in the event handler is declared using bind to set its context to the button it's listening to for click events. This behaviour happens by default courtesy of the DOM API, the example above is just to illustrate how that could be achieved with bind.

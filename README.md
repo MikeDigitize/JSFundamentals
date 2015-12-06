@@ -198,7 +198,33 @@ var foo = new Foo("mike");
 foo.sayName();  // mike
 ```
 
-<code>this</code> is a device used to assign properties specific to an instance of a constructor function. In the above we can see that <code>this</code>, when used in a constructor, refers to the instance of that constructor.
+<code>this</code> is a device that can be used in a constructor function to assign properties specific to an instance of that constructor. In the above we can see that <code>this</code>, when used in a constructor, refers to the instance of the constructor.
 
-The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. 
+The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. Context can be explicitly set in four different ways, as of ES6.
 
+On the function constructor's prototype, there are two methods that you can use to explicitly set the context of <code>this</code>: <code>call</code> and <code>apply</code> on any function you declare. Consider the following example:
+
+```javascript
+function foo() {
+  return this.bar;
+}
+var bar = "bar";
+var obj = { 
+  bar : "foo"
+};
+foo.call(obj);  // foo
+```
+
+In the above we have a function foo that returns <code>this.bar</code>. We have a variable <code>bar</code> defined in the global scope. We also have a variable <code>obj</code> which is an object that has a property called <code>bar</code>. If we were to call foo normally in the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. In the example above however we call the function using <code>call</code>. <code>call</code> and <code>apply</code> explicilty define the context of <code>this</code> within the function they're attached to, to the first argument passed into them. In the above example we can see foo is called using <code>call</code> and the context is set to the variable <code>obj</code>.
+
+The difference between call and apply is the second parameter they accept. The first sets the context of <code>this</code>, any subsequent parameters are the arguments passed into that function. <code>call</code> takes an indefinite amount of comma separated parameters, whilst <code>apply</code> takes a single array of values as its second parameter.
+
+```javascript
+function add(num1, num2) {
+  return num1 + num2;
+}
+addTwo.call(null, 5, 2); // 7
+addTwo.apply(null, [5, 2]);  // 7
+```
+
+Notice how both call and apply can be used in a non-context scenario. In the above example there is no reference to <code>this</code> so the first argument supplied to both is null, as we're not interested in setting context in this case, we just want to call a function and supply it with arguments.

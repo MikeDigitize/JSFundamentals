@@ -145,11 +145,11 @@ After the compilation stage the <code>x</code> variable declared with var is hoi
 
 ### Summary
 
-Variables declared with var or function are hoisted to the top of their parent scope. Variables are declared but are not assigned a value. Value assignment happens at run time, not compile time. Function declarations however are assigned their value, which is the function they represent. Function expressions are not assigned a value and are treated like a variable. Their value is assigned at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in an error. This area before they are assigned a value is known as the temporal dead zone.
+Variables declared with var or function are hoisted to the top of their parent scope. Variables are declared but are not assigned with their specified value. Value assignment happens at run time, not compile time. Initially the value of all variables is set to undefined. Function declarations are evaluated at compile time. Function expressions are just variables and so are treated like a variable. Their value is likewise assigned at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in an error. This area before they are assigned a value is known as the temporal dead zone.
 
 ## Context
 
-Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context and this reference can be accessed through <code>this</code>. Context can be defined organically or artificially in JavaScript. Consider the following example:
+Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context - available via <code>this</code>. Context can be defined organically or artificially in JavaScript. Consider the following example:
 
 ```html
 <button id="add" data-value="0">Add 1</button>

@@ -3,7 +3,7 @@ A guide to JavaScript
 
 ## JavaScript?
 
-A programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before running it. In this compilation stage a lot happens to your code, including lots of micro optimisations, the key thing to be aware of is that this is the time at which scope is defined.
+A programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before running it. In this compilation stage the JavaScript engine runs through your code and prepares it for execution, which includes optimising the code to be as fast as possible. It is at this time, during compilation, when scope is defined.
 
 ## Scope
 Scope refers to variable and function scope. When you declare a variable or function in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scoping at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
@@ -285,3 +285,52 @@ greetMike();  // Howdy Mike
 
 ```
 
+### Fat Arrow functions
+
+ES6 introduced a new syntax for functions, known as fat arrow functions. These functions handle context in a different way to their traditional counterparts. The below example helps illustrate this by first demonstrating how a traditional function declaration handles context. 
+
+```javascript
+var foo = "foo";
+var bar = {
+  foo : "bar",
+  timer : function() {
+    setTimeout(function() {
+      console.log(this.foo);  // foo
+    }, 500);
+  }
+}
+bar.timer();
+
+```
+
+In the above, the timer method on the object bar is called. Within this method the context would be set as per the default rule to the object bar. However, the use of a setTimeout within that method takes the context away from bar. setTimeout is attached to the global object and so the call site of its callback would no longer be the object bar, it would be the global object. When logging <code>this.foo</code> in the timeout's callback, the foo property would be looked up against the global object and so in this example would be "foo." Below is the same example using a fat arrow function.
+
+```javascript
+var foo = "foo";
+var bar = {
+  foo : "bar",
+  timer : function() {
+    setTimeout(() => {
+      console.log(this.foo);  // bar
+    }, 500);
+  }
+}
+bar.timer();
+
+```
+
+By using a fat arrow function the context of <code>this</code> is preserved to be that of its parent, which is the timer function on the object bar, meaning the <code>foo</code> property would be looked up against bar, not the global object. You can think of its behaviour to be the equivalent of using bind. The setTimeouts in the above example could be written in either of the following ways to achieve the same thing:
+
+```javascript
+// equivalents
+setTimeout(() => {
+  console.log(this.foo);
+}, 500);
+
+setTimeout(function() {
+  console.log(this.foo);
+}.bind(this), 500);
+
+```
+
+What actually happens behind the scenes is not the same as using bind however. In fact the binding of this does not happen at all in a fat arrow function. There is no <code>this</code> in a fat arrow, so context remains that of its parent.

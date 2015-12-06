@@ -32,7 +32,7 @@ function foo() {
 console.log(bar);
 ```
 
-When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available externally. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them, which we'll get to shortly.
+When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available externally. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them.
 
 ```javascript
 // declaration
@@ -59,7 +59,7 @@ for (let i = 0; i < 5l i++) {
 console.log(i);
 ```
 
-In the above, if <code>i</code> was declared with var it would be available outside of the block. Let and const are also handled differently to var and function by the compiler, which will be explained in the next section.
+In the above, if <code>i</code> was declared with var it would be available outside of the block. Let and const are also handled differently to var and function by the compiler. How they are handled will be explained in the next section.
 
 ### Summary
 Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compile stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
@@ -149,7 +149,7 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Context
 
-Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context and this reference can be accessed through <code>this</code>. Context can be defined organically or artificially in JavaScript and can be used to great effect in coding patterns and APIs. Consider the following example:
+Context in JavaScript is defined at runtime, after the compilation stage. Context refers to the value of the keyword <code>this</code>. Every function, when executing, has a reference to its execution context and this reference can be accessed through <code>this</code>. Context can be defined organically or artificially in JavaScript. Consider the following example:
 
 ```html
 <button id="add" data-value="0">Add 1</button>
@@ -206,7 +206,7 @@ var foo = new Foo("mike");
 foo.sayName();  // mike
 ```
 
-<code>this</code> is a device that can be used in a constructor function to assign properties specific to an instance of that constructor. In the above we can see that <code>this</code>, when used in a constructor, refers to the instance of the constructor.
+The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. <code>this</code> is a device that can be used in a constructor function to assign properties specific to an instance of that constructor. In the above we can see that <code>this</code>, when used in a constructor, refers to the instance of the constructor.
 
 The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. Context can be explicitly set in four different ways, as of ES6.
 

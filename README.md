@@ -360,7 +360,7 @@ What actually happens behind the scenes is not the same as using bind however. I
 <code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and is set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.
 
 ## Closures
-Closures are a concept that all JavaScript developers should understand and utilise in their code. In order to understand closures you must first have a good understanding of lexical scoping. Take the following example:
+In order to understand closures you must first have a good understanding of lexical scoping. Take the following example:
 
 ```javascript
 function bar() {
@@ -374,7 +374,7 @@ bar();  // a
 
 ```
 
-In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When ran, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and so then it's able to log that value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope).
+In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and then is able to log its value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope).
 
 There is nothing revelationary in the above. However, a slight modification of the code can begin to demonstrate the power of closures. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
 

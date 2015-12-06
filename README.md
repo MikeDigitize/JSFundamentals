@@ -374,7 +374,7 @@ bar();  // a
 
 ```
 
-In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and then is able to log its value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope).
+In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and then is able to log its value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope) and retains access to any variables in its scope.
 
 There is nothing revelationary in the above. However, a slight modification of the code can begin to demonstrate the power of closures. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
 
@@ -392,9 +392,9 @@ bar();  // foo
 
 ```
 
-In this example the function bar is returned from the function foo. The variable <code>a</code> is lexically scoped within foo and any descendant scopes. It is not available outside of the scope of function foo. However, by creating a variable <code>bar</code> in the global scope and assigning it to the return value of foo, when we call that function we have access to <code>a</code>, even though the call is outside of <code>a</code>'s lexical scope.
+In this example the function bar is returned from the function foo. The variable <code>a</code> is lexically scoped within foo and any descendant scopes. It is not available outside of the scope of foo. However, by creating a variable <code>bar</code> in the global scope and assigning it to the return value of foo, which is a function, when we call that function we have access to <code>a</code>, even though the call is made outside of the lexical scope of <code>a</code>.
 
-This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is still accessible at runtime, even if that reference is made outside of the scope it was defined in. In the above the function foo has returned and no longer being in use, yet closures still allow us to access values defined inside it. To help illustrate a practical use of closures consider the following piece of code;
+This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is accessible at runtime even if the reference is made outside of the scope it was defined in. In the above the function foo has returned and is no longer in use, yet closures still allows access to values defined inside it. To help illustrate a practical use of closures consider the following piece of code;
 
 ```javascript
 function percentage(percent) {

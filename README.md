@@ -1,5 +1,5 @@
 # AOJSGuide
-A guide to JavaScript
+A guide to JavaScript.
 
 ## JavaScript?
 
@@ -274,7 +274,7 @@ setTimeout(callback.bind({ name : "Mike" }), 1000);
 
 ```
 
-In the above, the callback function passed into setTimeout has its context set before it is called using <code>bind</code>. When the function is called as the timer finishes <code>this</code> is bound to the first argument supplied to bind. The following example shows how to use <code>bind</code> to supply additional arguments to a function. It works in the same way as <code>call</code> in that each subsequent value supplied after the context is passed into the function as an argument.
+In the above, the callback function passed into setTimeout has its context set before it is called using <code>bind</code>. When the function is called as the timer finishes <code>this</code> is bound to the first argument supplied to bind. The following example shows how to use <code>bind</code> to supply additional arguments to a function. It works in the same way as <code>call</code> in that each subsequent value supplied (after the context) is passed into the function as an argument.
 
 ```javascript
 function greet(greeting) {
@@ -319,7 +319,7 @@ bar.timer();
 
 ```
 
-By using a fat arrow function the context of <code>this</code> is preserved to be that of its parent, which is the timer function on the object bar, meaning the <code>foo</code> property would be looked up against bar, not the global object. You can think of its behaviour to be the equivalent of using bind. The setTimeouts in the above example could be written in either of the following ways to achieve the same thing:
+By using a fat arrow function the context of <code>this</code> is preserved to be that of its parent, which is the timer function on the object bar, meaning the <code>foo</code> property would be looked up against bar, not the global object. You can think of this behaviour in fat arrows to be the equivalent of using bind. The setTimeouts in the above example could be written in either of the following ways to achieve the same thing:
 
 ```javascript
 // equivalents
@@ -334,3 +334,6 @@ setTimeout(function() {
 ```
 
 What actually happens behind the scenes is not the same as using bind however. In fact the binding of this does not happen at all in a fat arrow function. There is no <code>this</code> in a fat arrow, so context remains that of its parent.
+
+### Summary
+<code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and is set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.

@@ -18,6 +18,8 @@ function bar() {
 }
 ```
 
+### Variable and function scope
+
 Scope dictates a variables availability. If a variable is defined in the global scope, it is available globally, throughout all your code. If a variable is defined in a function it is available only within that function.
 
 ```javascript
@@ -29,8 +31,6 @@ function foo() {
 // bar is not available outside of the function scope
 console.log(bar);
 ```
-
-### Variables and functions
 
 When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available externally. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them, which we'll get to shortly.
 

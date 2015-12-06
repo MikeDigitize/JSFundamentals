@@ -167,6 +167,8 @@ var a = "bar";
 bar();
 ```
 
+### The default context rule
+
 Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variables it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore has a reference to the variable <code>a</code>.
 
 This is known as the default context rule. Be aware however that in strict mode, as this has not been explicitly set, it will throw an error. To see how the default rule changes according to the call site, take the following example:
@@ -202,6 +204,8 @@ foo.sayName();  // mike
 
 The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. Context can be explicitly set in four different ways, as of ES6.
 
+### Call and Apply
+
 On the function constructor's prototype, there are two methods that you can use to explicitly set the context of <code>this</code>: <code>call</code> and <code>apply</code> on any function you declare. Consider the following example:
 
 ```javascript
@@ -215,9 +219,9 @@ var obj = {
 foo.call(obj);  // foo
 ```
 
-In the above we have a function foo that returns <code>this.bar</code>. We have a variable <code>bar</code> defined in the global scope. We also have a variable <code>obj</code> which is an object that has a property called <code>bar</code>. If we were to call foo normally in the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. In the example above however we call the function using <code>call</code>. <code>call</code> and <code>apply</code> explicilty define the context of <code>this</code> within the function they're attached to, to the first argument passed into them. In the above example we can see foo is called using <code>call</code> and the context is set to the variable <code>obj</code>.
+In the above we have a function foo that returns <code>this.bar</code>. We have a variable <code>bar</code> defined in the global scope. We also have a variable <code>obj</code> which is an object that has a property also called <code>bar</code>. If we were to call foo normally in the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. In the example above however we call the function using <code>call</code>. <code>call</code> and <code>apply</code> allow you to explicilty define the context of <code>this</code> within the function they're attached to. It is set to the first argument either are passed. In the above example we can see foo is called using <code>call</code> and the context is set to the variable <code>obj</code>.
 
-The difference between call and apply is the second parameter they accept. The first sets the context of <code>this</code>, any subsequent parameters are the arguments passed into that function. <code>call</code> takes an indefinite amount of comma separated parameters, whilst <code>apply</code> takes a single array of values as its second parameter.
+The difference between call and apply is in the subsequent parameter(s) they accept. The first argument is set to the context of <code>this</code>, any other parameters are the arguments passed into the function that they are called on. <code>call</code> takes an indefinite amount of comma separated parameters, whilst <code>apply</code> takes a single array of values as its second parameter.
 
 ```javascript
 function add(num1, num2) {
@@ -227,4 +231,4 @@ addTwo.call(null, 5, 2); // 7
 addTwo.apply(null, [5, 2]);  // 7
 ```
 
-Notice how both call and apply can be used in a non-context scenario. In the above example there is no reference to <code>this</code> so the first argument supplied to both is null, as we're not interested in setting context in this case, we just want to call a function and supply it with arguments.
+Notice how in the example above both call and apply can be used in a non-context based scenario. In the above there is no reference to <code>this</code> so the first argument supplied to both is null, as we're not interested in setting context in this case, we just want to call the function and supply it with arguments.

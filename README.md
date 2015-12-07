@@ -399,7 +399,7 @@ bar();  // foo
 
 In this example the function bar is returned from the function foo. The variable <code>a</code> is lexically scoped within foo and any descendant scopes. It is not available outside of the scope of foo. However, by creating a variable <code>bar</code> in the global scope and assigning it to the return value of foo, which is a function, when we call that function we have access to <code>a</code>, even though the call is made outside of the lexical scope of <code>a</code>.
 
-This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is accessible at runtime even if the reference is made outside of the scope it was defined in. In the above the function foo has returned and is no longer in use, yet closures still allows access to values defined inside it. To help illustrate a practical use of closures consider the following piece of code;
+This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is accessible at runtime even if the reference is made outside of the scope it was defined in. In the above the function foo has returned and is no longer in use, yet closures still allow access to values defined inside them. To help illustrate a more practical use of closures consider the following piece of code;
 
 ```javascript
 function percentage(percent) {
@@ -425,3 +425,53 @@ var half = percentage(50);
 half(100);  // 50
 
 ```
+
+### IIFE
+
+It is possible to create closure like effects at runtime through the use of IIFEs (Immediately Invoked Function Expressions). An IIFE is a function wrapped in an expression and immediatley called<code>(function(){})();</code>. Whereas with closures variables are able to be retrieved through reference, IIFEs close around values (not references to a value) inside them or passed in to them, essentially preserving a snapshot of the value at the point of execution. To illustrate that, consider the following example:
+
+```javascript
+var a = 1;
+var b = (function(c){
+    return a + c;
+})(a);
+++a;
+console.log(b); // 2
+
+```
+
+In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. Its value at time of execution is preserved, so even when <code>a</code> is modified later it has no bearing on the value within the IIFE. To further demonstrate the usefulness of IIFEs consider the following:
+
+```html
+<button class="btn">Click me!</button>
+<button class="btn">Click me!</button>
+<button class="btn">Click me!</button>
+```
+
+```javascript
+const btns = document.querySelector(".btn");
+for(let i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", () => { 
+    console.log(`I am button ${i}`);
+  }, false);
+}
+
+```
+
+If the above code was executed, what would be expected is that each button when clicked would log out its index (<code>i</code>). However, what actually happens is that all will log the last value of <code>i</code>, which in the above would be 2. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is reference in the console log it is looked up and its current value - 2 - is returned. This example can be fixed through the use of an IIFE:
+
+```javascript
+const btns = document.querySelector(".btn");
+for(let i = 0; i < btns.length; i++) {
+  (function(index){
+    btns[index].addEventListener("click", () => { 
+      console.log(`I am button ${index}`);
+    }, false);
+  })(i);
+}
+
+```
+
+The above traps the current value of <code>i</code> at execution time through the IIFE, meaning when clicked, each button will return that value and not the current value of <code>i</code>.
+
+

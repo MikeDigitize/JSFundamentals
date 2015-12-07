@@ -20,7 +20,7 @@ function bar() {
 
 ### Variable and function scope
 
-Scope dictates a variables availability. If a variable is defined in the global scope, it is available globally, throughout all your code. If a variable is defined in a function it is available only within that function andnot outside of it.
+Scope dictates a variables availability. If a variable is defined in the global scope, it is available globally, throughout all your code. If a variable is defined in a function it is available only within that function and not outside of it.
 
 ```javascript
 function foo() {
@@ -32,7 +32,7 @@ function foo() {
 console.log(bar);
 ```
 
-When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler treats them. We'll look at why this is important to understand shortly.
+When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler treats them. The next section will examine the distinction.
 
 ```javascript
 // declaration
@@ -57,7 +57,7 @@ for (let i = 0; i < 5; i++) {
 console.log(i);
 ```
 
-Let and const are also handled differently to var and function by the compiler. How they are handled will be explained in the next section.
+Let and const are also handled differently to var and function by the compiler (see the next section for an explanation as to why).
 
 ### Summary
 Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compile stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
@@ -138,7 +138,7 @@ function foo() {
 }
 ```
 
-After the compilation stage the <code>x</code> variable declared with var is hoisted but the <code>y</code> variable declared with let is not. When executed <code>x</code> has been declared but not yet given its value, <code>y</code> however has not been declared and an attempt to access it will throw an error. The area above the let declaration is known as the <code>temporal dead zone</code>.
+After the compilation stage the <code>x</code> variable declared with var is hoisted but the <code>y</code> variable declared with let is not. When executed <code>x</code> has been declared but not yet given its value, <code>y</code> however has not been declared and an attempt to access it will throw an error. The area above the let declaration is known as the overly dramatic sounding <code>temporal dead zone</code>.
 
 ### Summary
 
@@ -201,6 +201,7 @@ Foo.prototype.sayName = function() {
 };
 var foo = new Foo("mike");
 foo.sayName();  // mike
+
 ```
 
 The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, refers to the instance of the constructor. It can therefore be used to set values specific to that instance.
@@ -220,6 +221,7 @@ var obj = {
   bar : "foo"
 };
 foo.call(obj);  // foo
+
 ```
 
 In the above the function foo returns a reference to <code>this.bar</code>. There is a variable <code>bar</code> defined in the global scope. There's also a variable <code>obj</code>; an object with a property also named <code>bar</code>. If we were to call foo without the use of <code>call</code>, as its call site is the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. 
@@ -285,7 +287,7 @@ greetMike();  // Howdy Mike
 
 ```
 
-It is important to note that bind cannot be used directly on function declarations. To use bind you must create a new reference to the bound function. To illustrate this, consider the following:
+It is important to note that bind (and call and apply) cannot be used on function literals, they must be used only on a reference to the function. Call and apply, as they both execute the function they're called on, are applied directly to the function reference, whilst with bind the bound function must be assigned to a new reference. When this reference to the bound function is called the new binding rules will take effect. To illustrate this, consider the following:
 
 ```javascript
 // syntax error
@@ -297,7 +299,10 @@ function foo() {
   return this.name;
 }
 
-// does nothing as the bound function is not assigned to a nwe variable
+// calls foo
+foo.call({ name : "foo" }); // foo
+
+// does nothing as the bound function is not assigned to a new reference
 foo.bind({ name : "foo" });
 
 // correct: bar is a reference to the bound function

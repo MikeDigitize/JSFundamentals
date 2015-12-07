@@ -449,8 +449,8 @@ In the above IIFE, the variable <code>a</code> is passed in as an argument and a
 ```
 
 ```javascript
-const btns = document.querySelector(".btn");
-for(let i = 0; i < btns.length; i++) {
+var btns = document.querySelector(".btn");
+for(var i = 0; i < btns.length; i++) {
   btns[i].addEventListener("click", () => { 
     console.log(`I am button ${i}`);
   }, false);
@@ -461,8 +461,8 @@ for(let i = 0; i < btns.length; i++) {
 If the above code was executed, what would be expected is that each button when clicked would log out its index (<code>i</code>). However, what actually happens is that all will log the last value of <code>i</code>, which in the above would be 2. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is reference in the console log it is looked up and its current value - 2 - is returned. This example can be fixed through the use of an IIFE:
 
 ```javascript
-const btns = document.querySelector(".btn");
-for(let i = 0; i < btns.length; i++) {
+var btns = document.querySelector(".btn");
+for(var i = 0; i < btns.length; i++) {
   (function(index){
     btns[index].addEventListener("click", () => { 
       console.log(`I am button ${index}`);
@@ -472,6 +472,18 @@ for(let i = 0; i < btns.length; i++) {
 
 ```
 
-The above traps the current value of <code>i</code> at execution time through the IIFE, meaning when clicked, each button will return that value and not the current value of <code>i</code>.
+The above traps the value of <code>i</code> at execution time through the IIFE, meaning each button will log that value and not the final value assigned to <code>i</code>. Pre ES6 an IIFE was the only way to combat this specific problem. Fortunately block scoped variables don't have the same limitations as var. In ES6, swapping out var for let will fix the problem without the need for an IIFE.
+
+```javascript
+const btns = document.querySelector(".btn");
+for(let i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", () => { 
+    console.log(`I am button ${i}`);
+  }, false);
+}
+
+```
+
+As <code>i</code> is block scoped it is only available within the for loop block and so is not available for lookup after the block has executed. Moving the <code>i</code> outside the for loop makes it available again and mimics the behaviour of var in the previous examples.
 
 

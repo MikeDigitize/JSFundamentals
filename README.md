@@ -365,7 +365,7 @@ What actually happens behind the scenes is not the same as using bind however. I
 <code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and is set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.
 
 ## Closures
-In order to understand closures you must first have a good understanding of lexical scoping. Take the following example:
+Understanding closures is something that can only really be done after understanding lexical scoping. Take the following example:
 
 ```javascript
 function bar() {
@@ -381,7 +381,7 @@ bar();  // a
 
 In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and then is able to log its value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope) and retains access to any variables in its scope.
 
-There is nothing revelationary in the above. However, a slight modification of the code can begin to demonstrate the power of closures. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
+The code above might help illustrate closures in their most simple form but it doesn't demonstrate their usefulness as a pattern, not without a small modification. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
 
 ```javascript
 function foo() {
@@ -413,9 +413,9 @@ vat(30);  // 6
 
 ```
 
-The function <code>percentage</code> calculates the percentage of a number. The percentage is determined by the value of the argument it accepts. Its return value however is not the calculated answer - how could it be, at this point there is no value to calculate against - it is a function. It is this returned function that accepts the value to calculate a percentage of. 
+The function <code>percentage</code> calculates the percentage of a number. The percentage is determined by the value of the argument it accepts. Its return value however is not the calculated answer - how could it be, at this point there is no value to calculate against - it is a function. It is this returned function that accepts a value to calculate the percentage of. 
 
-What has happened is the returned function has closed over the scope of its parent. At compilation time the value of percent is undefined, but this doesn't matter - the returned function still has access to its reference through scope. This is a powerful technique. It's often referred to as partial application or currying and allow functions like percentage to be re-used again and again.
+What has happened is the returned function has closed over the scope of its parent. At compilation time the value of <code>percent</code> is undefined, but this doesn't matter - the returned function still has access to its reference through scope. When the percentage function is called the value it gets called with defines <code>percent</code>, essentially pre-loading the returned function with one of the two values needed to make the calculation. Now when the returned function is called, it calculates the pre-loaded percent of the value it's passed. This technique is often referred to as partial application or currying and allows functions like percentage to be re-used over and over producing new functions pre-loaded with different values.
 
 ```javascript
 var vat = percentage(20);
@@ -458,7 +458,7 @@ for(var i = 0; i < btns.length; i++) {
 
 ```
 
-If the above code was executed, what would be expected is that each button when clicked would log out its index (<code>i</code>). However, what actually happens is that all will log the last value of <code>i</code>, which in the above would be 2. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is reference in the console log it is looked up and its current value - 2 - is returned. This example can be fixed through the use of an IIFE:
+If the above code was executed, what would be expected is that each button when clicked would log out its index (<code>i</code>). However, what actually happens is that all will log the last value of <code>i</code>, which in the above would be <code>2</code>. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is referenced in the console log it's looked up and its current value <code>2</code> is returned. This example can be fixed through the use of an IIFE:
 
 ```javascript
 var btns = document.querySelector(".btn");
@@ -472,7 +472,7 @@ for(var i = 0; i < btns.length; i++) {
 
 ```
 
-The above traps the value of <code>i</code> at execution time through the IIFE, meaning each button will log that value and not the final value assigned to <code>i</code>. Pre ES6 an IIFE was the only way to combat this specific problem. Fortunately block scoped variables don't have the same limitations as var. In ES6, swapping out var for let will fix the problem without the need for an IIFE.
+The above traps the value of <code>i</code> at execution time in the IIFE, meaning each button will log its current value and not its final value. Pre ES6 an IIFE was the only way to combat this specific problem. Fortunately block scoped variables don't have the same limitations as var. In ES6, swapping out var for let will fix the problem without the need for an IIFE.
 
 ```javascript
 const btns = document.querySelector(".btn");
@@ -484,6 +484,12 @@ for(let i = 0; i < btns.length; i++) {
 
 ```
 
-As <code>i</code> is block scoped it is only available within the for loop block and so is not available for lookup after the block has executed. Moving the <code>i</code> outside the for loop makes it available again and mimics the behaviour of var in the previous examples.
+As <code>i</code> is block scoped it is only available within the for loop block and so is not available for lookup after the block has executed. Moving the <code>let i = 0;</code> declaration outside the for loop makes it available again and mimics the behaviour of var in the previous examples.
 
+### Summary
 
+Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to that value. 
+
+IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time.
+
+## Types and values

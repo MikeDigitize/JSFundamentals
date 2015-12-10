@@ -490,6 +490,32 @@ As <code>i</code> is block scoped it is only available within the for loop block
 
 Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to that value. 
 
-IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time.
+IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
+
+The following example helps demonstrate the difference between the two:
+
+```javascript
+
+for(var i = 0; i < 5; i++) {
+    (function() {
+        console.log(i); // 0, 1, 2, 3, 4
+        setTimeout(function() {
+            console.log(i); // 5, 5, 5, 5, 5
+        }, 500);
+    })();
+}
+
+for(var i = 0; i < 5; i++) {
+    (function(j) {
+        console.log(i); // 0, 1, 2, 3, 4
+        setTimeout(function() {
+            console.log(j); // 0, 1, 2, 3, 4
+        }, 500);
+    })(i);
+}
+
+```
+
+In the first example, a reference to <code>i</code> from the for loop is lexically scoped the setTimeout and the IIFE's function. At runtime during each loop the IIFE logs the current value of <code>i</code> which increments up from 0-4. 
 
 ## Types and values

@@ -492,9 +492,50 @@ Closures can be thought of as a tool to allow runtime access to variables outsid
 
 IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
 
+## Dynamic Scope
+
+Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is created whenever a function is called and is referred to as <code>variable environment</code>, or prioer to that, the <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope, including the arguments. It also gets access to its lexical scope through an inaccessible property <code>[[scope]]</scope>. This property allows reference to each parent scope of that particular function until it reaches the global scope. When looking up variable references the JavaScript engine will check each scope, and its parent scope until it reaches the global scope. Only after it has checked the global scope will it throw an error if it hasn't found that variable declaration .
+
+The <code>variable environment</code> environment is what makes closures possible. Consider the following:
+
+```javascript
+function count() {
+  let count = 0;
+  return () => {
+    return ++count;
+  }
+}
+
+var foo = count();
+var bar = count();
+bar();  // 1
+bar();  // 2
+foo();  // 1
+
+```
+
 ## Functions
 
-Functions feature heavily in the previous chapters on scope, context and closures. These aspects of JavaScript make much more sense when their one common key ingredient - functions - are understood.
+Functions feature heavily in the previous chapters on scope, context and closures. These aspects of JavaScript make much more sense when their one common key ingredient - functions - are understood. Functions are objects. They can have properties and methods like any other object. But they have one important difference to other types of objects in that they can be called, as functions. It's useful to think of objects and functions as the two building blocks of JavaScript.
 
+The first thing to know about functions is that, when declared, get a <code>prototype</code> property automatically attached to them. The <code>prototype</code> property is very important. It facilitates what is known as prototypal inheritance, a fundamental part of JavaScript which will be covered in the next chapter. The <code>prototype</code> property only needs to be used when creating constructor functions. It's not needed for regular function use. 
 
-Functions play a huge part in the way scope, context and closures work. Regarding scope, variables are lexically scoped to functions at compile time, in context functions contain a reference to their execution context and with closures functions close over lexically scoped variables.
+### Calling a function
+
+Consider the following:
+
+```javascript
+function count() {
+  let count = 0;
+  return () => {
+    return ++count;
+  }
+}
+
+var foo = count();
+foo();  // 1
+
+```
+
+When the function <code>count</code> is called
+

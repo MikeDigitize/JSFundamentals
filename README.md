@@ -440,7 +440,7 @@ console.log(b); // 2
 
 ```
 
-In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. Its value at time of execution is preserved, so even when <code>a</code> is modified later it has no bearing on the value within the IIFE. To further demonstrate the usefulness of IIFEs consider the following:
+In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. As the expression is immediately evaluated its value at time of execution is all that matters. To further demonstrate the usefulness of IIFEs consider the following:
 
 ```html
 <button class="btn">Click me!</button>
@@ -458,7 +458,7 @@ for(var i = 0; i < btns.length; i++) {
 
 ```
 
-If the above code was executed, what would be expected is that each button when clicked would log out its index (<code>i</code>). However, what actually happens is that all will log the last value of <code>i</code>, which in the above would be <code>2</code>. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is referenced in the console log it's looked up and its current value <code>2</code> is returned. This example can be fixed through the use of an IIFE:
+If the above was executed, each button, on click, would be expected to log out its index (<code>i</code>). What actually happens is that all will log the last value of <code>i</code>, which in the above would be <code>2</code>. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is referenced in the console log it's looked up and its current value <code>2</code> is returned. This example can be fixed through the use of an IIFE:
 
 ```javascript
 var btns = document.querySelector(".btn");
@@ -472,7 +472,7 @@ for(var i = 0; i < btns.length; i++) {
 
 ```
 
-The above traps the value of <code>i</code> at execution time in the IIFE, meaning each button will log its current value and not its final value. Pre ES6 an IIFE was the only way to combat this specific problem. Fortunately block scoped variables don't have the same limitations as var. In ES6, swapping out var for let will fix the problem without the need for an IIFE.
+The above redefines <code>i</code> to <code>index</code> and traps that value at runtime time in the IIFE, meaning each button will log the current value of <code>index</code> and not the final value of <code>i</code>. Pre ES6, an IIFE was the only way to combat this specific problem. Fortunately block scoped variables don't have the same limitations as var. In ES6, swapping out var for let will fix the problem without the need for an IIFE.
 
 ```javascript
 const btns = document.querySelector(".btn");
@@ -491,31 +491,5 @@ As <code>i</code> is block scoped it is only available within the for loop block
 Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to that value. 
 
 IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
-
-The following example helps demonstrate the difference between the two:
-
-```javascript
-
-for(var i = 0; i < 5; i++) {
-    (function() {
-        console.log(i); // 0, 1, 2, 3, 4
-        setTimeout(function() {
-            console.log(i); // 5, 5, 5, 5, 5
-        }, 500);
-    })();
-}
-
-for(var i = 0; i < 5; i++) {
-    (function(j) {
-        console.log(i); // 0, 1, 2, 3, 4
-        setTimeout(function() {
-            console.log(j); // 0, 1, 2, 3, 4
-        }, 500);
-    })(i);
-}
-
-```
-
-In the first example, a reference to <code>i</code> from the for loop is lexically scoped the setTimeout and the IIFE's function. At runtime during each loop the IIFE logs the current value of <code>i</code> which increments up from 0-4. 
 
 ## Types and values

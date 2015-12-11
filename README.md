@@ -440,7 +440,7 @@ console.log(b); // 2
 
 ```
 
-In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. As the expression is immediately evaluated its value at time of execution is all that matters. To further demonstrate the usefulness of IIFEs consider the following:
+In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. As the expression is immediately evaluated its value at time of execution is all that matters. This is great, however not all that useful. This is because the above code is synchronous. Changes to <code>a</code> do not happen until the expression finishes executing. To help demonstrate how useful IIFEs can be, consider the following asynchronous example:
 
 ```html
 <button class="btn">Click me!</button>
@@ -458,7 +458,7 @@ for(var i = 0; i < btns.length; i++) {
 
 ```
 
-If the above was executed, each button, on click, would be expected to log out its index (<code>i</code>). What actually happens is that all will log the last value of <code>i</code>, which in the above would be <code>2</code>. The reason for this is whilst each callback function retains a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. So when it is referenced in the console log it's looked up and its current value <code>2</code> is returned. This example can be fixed through the use of an IIFE:
+If the above, each button on click would be expected to log out its index <code>i</code>. What actually happens is that all will log the current value of <code>i</code>, which in the above after the loop finishes would be <code>2</code>. The reason for this is each callback function retains only a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. This example can be fixed through the use of an IIFE:
 
 ```javascript
 var btns = document.querySelector(".btn");
@@ -484,7 +484,7 @@ for(let i = 0; i < btns.length; i++) {
 
 ```
 
-As <code>i</code> is block scoped it is only available within the for loop block and so is not available for lookup after the block has executed. Moving the <code>let i = 0;</code> declaration outside the for loop makes it available again and mimics the behaviour of var in the previous examples.
+As <code>i</code> is block scoped it is only available within the for loop block and so is not available for lookup after the block expires. However, moving the <code>let i = 0;</code> declaration outside the for loop makes it available again and mimics the behaviour of var in the previous examples.
 
 ### Summary
 
@@ -492,4 +492,9 @@ Closures can be thought of as a tool to allow runtime access to variables outsid
 
 IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
 
-## Types and values
+## Functions
+
+Functions feature heavily in the previous chapters on scope, context and closures. These aspects of JavaScript make much more sense when their one common key ingredient - functions - are understood.
+
+
+Functions play a huge part in the way scope, context and closures work. Regarding scope, variables are lexically scoped to functions at compile time, in context functions contain a reference to their execution context and with closures functions close over lexically scoped variables.

@@ -5,7 +5,7 @@ A guide to JavaScript.
 
 JavaScript is a programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before its executed. In this compilation stage the JavaScript engine runs through your code and compiles it to machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when scope is defined.
 
-## Scope
+## Lexical scope
 Scope refers to variable and function scope. When you declare a variable or function in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scoping at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
 
 ```javascript
@@ -20,7 +20,7 @@ function bar() {
 
 ### Variable and function scope
 
-Scope dictates a variables availability. If a variable is defined in the global scope, it is available globally, throughout all your code. If a variable is defined in a function it is available only within that function and not outside of it.
+Scope dictates a variables availability. If a variable is defined in the global scope, it is available globally, throughout anything declared in the global environment. If a variable is defined in a function it is available only within that function and not outside of it.
 
 ```javascript
 function foo() {
@@ -143,6 +143,29 @@ After the compilation stage the <code>x</code> variable declared with var is hoi
 ### Summary
 
 Variables declared with var or function are hoisted to the top of their parent scope in the compilation stage before the code is executed. Variables are declared but are not assigned their specified value. Value assignment happens at run time, not compile time. Initially the value of all variables is set to undefined. Function declarations are evaluated at compile time. Function expressions are just variables and so are treated as a variable. Their value is likewise assigned at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in an error. This area before they are assigned a value is known as the temporal dead zone.
+
+## Dynamic Scope
+
+Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is created whenever a function is called and is referred to as <code>variable environment</code>, or prior to ES5, the <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
+
+This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If it doesn't find it it looks to its parent, and then its parent's parent until it reaches the global scope. Only after it has checked the global scope and not found it will it throw a reference error.
+
+Consider the following:
+
+```javascript
+function bar() {
+  var foobar = "foobar"; 
+  function foo() {
+    return foobar;
+  }
+  return foo();
+}
+
+bar();  // foobar
+
+```
+
+The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - the <code>variable environment</code>, which holds anything in its immediate and lexical scopes. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
 
 ## Context
 
@@ -491,30 +514,6 @@ As <code>i</code> is block scoped it is only available within the for loop block
 Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to that value. 
 
 IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
-
-## Dynamic Scope
-
-Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is created whenever a function is called and is referred to as <code>variable environment</code>, or prior to ES5, the <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope, including the arguments and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check for its declaration against its scope and then each parent scope until it reaches the global scope. Only after it has checked the global scope and not found it will it throw a reference error.
-
-The <code>variable environment</code> environment is what makes closures possible. Consider the following:
-
-```javascript
-function count() {
-  let count = 0;
-  return () => {
-    return ++count;
-  }
-}
-
-var foo = count();
-var bar = count();
-bar();  // 1
-bar();  // 2
-foo();  // 1
-
-```
-
-The function <code>count</code> in the above returns a function that creates a closure around the variable <code>count</code>. When 
 
 ## Functions
 

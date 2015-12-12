@@ -494,7 +494,7 @@ IIFEs work in a similar way, only they close over values not references to value
 
 ## Dynamic Scope
 
-Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is created whenever a function is called and is referred to as <code>variable environment</code>, or prior to that, the <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope, including the arguments. It also gets access to its lexical scope through an inaccessible property <code> [[scope]]</code>. This property allows reference to each parent scope of that particular function and its parent until it reaches the global scope. When looking up variable references the JavaScript engine will check for its declaration against its scope and then each parent scope until it reaches the global scope. Only after it has checked the global scope and not found it will it throw an error.
+Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is created whenever a function is called and is referred to as <code>variable environment</code>, or prior to ES5, the <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope, including the arguments and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check for its declaration against its scope and then each parent scope until it reaches the global scope. Only after it has checked the global scope and not found it will it throw a reference error.
 
 The <code>variable environment</code> environment is what makes closures possible. Consider the following:
 
@@ -513,6 +513,8 @@ bar();  // 2
 foo();  // 1
 
 ```
+
+The function <code>count</code> in the above returns a function that creates a closure around the variable <code>count</code>. When 
 
 ## Functions
 

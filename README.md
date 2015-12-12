@@ -6,7 +6,7 @@ A guide to JavaScript.
 JavaScript is a compiled programming language. What does that mean? It means JavaScript code is compiled by a JavaScript engine first before it is executed. Say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code, then executes it. In this compilation stage the JavaScript engine runs through the code and compiles it into machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when lexical scope is defined.
 
 ## Lexical scope
-Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source - and is simply scope defined at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
+Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source. Pre ES6, variables were scoped either to the global scope or to a function scope. 
 
 ```javascript
 // global scope
@@ -144,9 +144,9 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Dynamic Scope
 
-Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is created whenever a function is called and is referred to as <code>variable environment</code>, or prior to ES5, the <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
+Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is scope created whenever a function is called and is referred to as its <code>variable environment</code>, or prior to ES5, <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
 
-This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If it doesn't find it it looks to its parent, and then its parent's parent until it reaches the global scope. Only after it has checked the global scope and not found it will it throw a reference error.
+This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If not found it looks to its parent, and then its parent's parent until it reaches the global scope where if it's not found the engine will throw a reference error.
 
 Consider the following:
 
@@ -167,21 +167,11 @@ The variable <code>foobar</code> is defined in the scope of <code>bar</code> and
 
 ## Context
 
-Context, like dynamic scope, in JavaScript is defined at runtime, after the compilation stage. Every function, when executing, has a reference to its execution context. JavaScript stores this reference as the keyword <code>this</code>. Context can be defined organically or artificially in JavaScript. Consider the following example:
+Context, like dynamic scope, in JavaScript is defined at runtime, after the compilation stage. Every function, when executing, has a reference to its execution context. JavaScript stores this reference as the keyword <code>this</code>. Context can be defined organically or artificially in JavaScript. 
 
-```html
-<button id="add" data-value="0">Add 1</button>
-```
+### The default context rule
 
-```javascript
-var btn = document.querySelector("#add");
-btn.addEventListener("click", function() {
-  var count = this.getAttribute("data-value");
-  this.setAttribute("data-value", ++Number(count));
-}, false);
-```
-
-When using <code>addEventListener</code> from the DOM API, the context of <code>this</code> in the event handler is set behind the scenes to the element the event was triggered from. This is a convenient design choice as often in an event handler you will need a reference to the trigger element. To understand how context is organically determined take the following example:
+Consider the following example:
 
 ```javascript
 function bar() {
@@ -189,9 +179,8 @@ function bar() {
 }
 var a = "bar";
 bar();
-```
 
-### The default context rule
+```
 
 Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variables it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore has a reference to the variable <code>a</code>.
 
@@ -513,11 +502,13 @@ Closures can be thought of as a tool to allow runtime access to variables outsid
 
 IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
 
-## Functions
+## Prototypal inheritance
 
-Functions feature heavily in the previous chapters on scope, context and closures. These aspects of JavaScript make much more sense when their one common key ingredient - functions - are understood. Functions are objects. They can have properties and methods like any other object. But they have one important difference to other types of objects in that they can be called, as functions. It's useful to think of objects and functions as the two building blocks of JavaScript.
+JavaScript is an object oriented language. Everything is an object or behaves like one. Its inheritance model is not class based like other OOP languages like Java or C#, it is prototype based. Understanding prototypes requires a solid understanding of functions.
 
-The first thing to know about functions is that, when declared, get a <code>prototype</code> property automatically attached to them. The <code>prototype</code> property is very important. It facilitates what is known as prototypal inheritance, a fundamental part of JavaScript which will be covered in the next chapter. The <code>prototype</code> property only needs to be used when creating constructor functions. It's not needed for regular function use. 
+### Functions
+
+Functions are objects. They can have properties and methods like any other object. But despite that it's useful in some contexts to think of objects and functions as two different things. When a function is declared, the function object gets a <code>prototype</code> property, automatically. The <code>prototype</code> property facilitates prototypal inheritance. The <code>prototype</code> property only needs to be used when creating constructor functions. It's not needed for regular function use. 
 
 ### Calling a function
 

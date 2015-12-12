@@ -3,10 +3,10 @@ A guide to JavaScript.
 
 ## The JavaScript Compiler
 
-JavaScript is a programming language. A compiled programming language. What does that mean? When you write some JavaScript code to run in a web browser or any other JavaScript environment, it first needs to be compiled before it gets executed. Let's say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code before its executed. In this compilation stage the JavaScript engine runs through your code and compiles it to machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when scope is defined.
+JavaScript is a compiled programming language. What does that mean? It means JavaScript code is compiled by a JavaScript engine first before it is executed. Say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code, then executes it. In this compilation stage the JavaScript engine runs through the code and compiles it into machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when lexical scope is defined.
 
 ## Lexical scope
-Scope refers to variable and function scope. When you declare a variable or function in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scoping at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
+Scope refers to variable and function scope. When you declare a variable or function in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scope defined at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
 
 ```javascript
 // global scope

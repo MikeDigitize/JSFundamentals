@@ -6,7 +6,7 @@ A guide to JavaScript.
 JavaScript is a compiled programming language. What does that mean? It means JavaScript code is compiled by a JavaScript engine first before it is executed. Say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code, then executes it. In this compilation stage the JavaScript engine runs through the code and compiles it into machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when lexical scope is defined.
 
 ## Lexical scope
-Scope refers to variable and function scope. When you declare a variable or function in JavaScript it is scoped based on its location within your script at author time. This is known as lexical scoping - scope defined at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
+Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source - and is simply scope defined at the compiler stage. Pre ES6, variables were scoped either to the global scope or to a function scope. 
 
 ```javascript
 // global scope
@@ -20,7 +20,7 @@ function bar() {
 
 ### Variable and function scope
 
-Scope dictates a variables availability. If a variable is defined in the global scope, it is available globally, throughout anything declared in the global environment. If a variable is defined in a function it is available only within that function and not outside of it.
+If a variable is defined in the global scope, it is available globally, throughout any code executed in the global environment. If a variable is defined in a function it is scoped to that function and therefore is available only within that function, not outside of it.
 
 ```javascript
 function foo() {
@@ -32,7 +32,7 @@ function foo() {
 console.log(bar);
 ```
 
-When you write JavaScript you declare things either as variables or as functions. The compiler determines function scope the same way as it does variable scope, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler treats them. The next section will examine the distinction.
+In JavaScript things are declared either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two, other than the way they're declared (see below), is in the way the compiler treats them. The next section covers this.
 
 ```javascript
 // declaration
@@ -45,7 +45,7 @@ var foo = function() {}
 
 ### Let and const
 
-ES6 introduced two new ways for variables to be declared <code>const</code> and <code>let</code>. These both have different scoping criteria to var or function. Const and let are block scoped which means they are available only within the block <code>{ }</code> they are declared in.
+ES6 introduced two new ways for variables to be declared - <code>const</code> and <code>let</code>. These both have different scoping criteria to var and function, and are also handled differently by the compiler (see the next section for an explanation as to how). Const and let are lexically block scoped which means they are available only within the block <code>{ }</code> they are declared in.
 
 ```javascript
 for (let i = 0; i < 5; i++) {
@@ -56,8 +56,6 @@ for (let i = 0; i < 5; i++) {
 // i is scoped to the for loop block and not available externally
 console.log(i);
 ```
-
-Let and const are also handled differently to var and function by the compiler (see the next section for an explanation as to why).
 
 ### Summary
 Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compile stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
@@ -169,7 +167,7 @@ The variable <code>foobar</code> is defined in the scope of <code>bar</code> and
 
 ## Context
 
-Context in JavaScript is defined at runtime, after the compilation stage. Every function, when executing, has a reference to its execution context. JavaScript stores this reference using the keyword <code>this</code>. Context can be defined organically or artificially in JavaScript. Consider the following example:
+Context, like dynamic scope, in JavaScript is defined at runtime, after the compilation stage. Every function, when executing, has a reference to its execution context. JavaScript stores this reference as the keyword <code>this</code>. Context can be defined organically or artificially in JavaScript. Consider the following example:
 
 ```html
 <button id="add" data-value="0">Add 1</button>

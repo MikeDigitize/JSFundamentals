@@ -167,7 +167,7 @@ The variable <code>foobar</code> is defined in the scope of <code>bar</code> and
 
 ### Summary
 
-Lexical scope is defined at compile time. At runtime when a function is encountered, the JavaScript engine creates an object representing its <code>variable environment</code> which holds references to everything in that functions's lexical scope. When asked to lookup a variable reference, the engine first checks against the function's immediate scope through the <code>variable environment</code>. If it doesn't find it there, it continues to search against each parent scope until it reaches the global scope. The reference to each subsequent parent scope is held in the <code>variable environment</code>. As this object is defined at runtime after a function call it is known as dynamic scoping.
+Lexical scope is defined at compile time. At runtime when a function call is made, the JavaScript engine creates an object representing that function's <code>variable environment</code> which holds references to everything in its lexical scope. When asked to lookup a variable referenced within the function, the engine first checks against its immediate scope via the <code>variable environment</code>. If it doesn't find it there, it continues to search against each parent scope of the function until it reaches the global scope. The reference to these parent scopes is held in the <code>variable environment</code> which, as it's created and defined at runtime, is known as dynamic scoping.
 
 ## Context
 

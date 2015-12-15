@@ -512,24 +512,11 @@ JavaScript is an object oriented language. Everything is an object or behaves li
 
 ### Functions
 
-Functions are objects. They can have properties and methods like any other object. But despite that it's useful in some contexts to think of objects and functions as two different things. When a function is declared, the function object gets a <code>prototype</code> property, automatically. The <code>prototype</code> property facilitates prototypal inheritance. The <code>prototype</code> property only needs to be used when creating constructor functions. It's not needed for regular function use. 
+Functions are objects. They can have properties and methods like any other object. But despite that it's useful in some contexts to think of objects and functions as two different things and, even more useful, is to think of them as the two building blocks of JavaScript. 
 
-### Calling a function
+When a function is declared, the function object that is created as a result has a <code>prototype</code> property that the JavaScript engine creates and attaches to it. It is this property that facilitates prototypal inheritance. The <code>prototype</code> remains benign in normal function usage, it's only when inheritance is required that it becomes the facilitator. Because of this nature, you can think of functions in JavaScript as having two very different uses.
 
-Consider the following:
 
-```javascript
-function count() {
-  let count = 0;
-  return () => {
-    return ++count;
-  }
-}
 
-var foo = count();
-foo();  // 1
 
-```
-
-When the function <code>count</code> is called
 

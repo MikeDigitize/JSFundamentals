@@ -144,7 +144,7 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Dynamic Scope
 
-Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is scope created whenever a function is called, and is referred to as its <code>variable environment</code>, or prior to ES5, <code>activation object</code>. The <code>variable environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
+Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is scope created whenever a function is called, and is referred to as its variable <code>environment</code>, or prior to ES5, <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
 
 This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If not found it looks to its parent, and then its parent's parent until it reaches the global scope where if it's not found the engine will throw a reference error.
 
@@ -163,11 +163,11 @@ bar();  // foobar
 
 ```
 
-The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - the <code>variable environment</code>, which holds anything in its immediate and lexical scopes. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
+The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - its <code>environment</code>, which holds anything in its immediate and lexical scopes. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
 
 ### Summary
 
-Lexical scope is defined at compile time. At runtime when a function call is made, the JavaScript engine creates an object representing that function's <code>variable environment</code> which holds references to everything in its lexical scope. When asked to lookup a variable referenced within the function, the engine first checks against its immediate scope via the <code>variable environment</code>. If it doesn't find it there, it continues to search against each parent scope of the function until it reaches the global scope. The reference to these parent scopes is held in the <code>variable environment</code> which, as it's created and defined at runtime, is known as dynamic scoping.
+Lexical scope is defined at compile time. At runtime when a function call is made, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical scope. When asked to lookup a variable referenced within the function, the engine first checks against its immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent scope of the function until it reaches the global scope. The reference to these parent scopes is held in the <code>environment</code> which, as it's created and defined at runtime, is known as dynamic scoping.
 
 ## Context
 

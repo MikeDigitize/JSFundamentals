@@ -516,10 +516,10 @@ The first step to understanding prototypal inheritance is to recognise how the o
 function A(){}
 
 var foo = A();
-console.log(foo); // undefined
+foo; // undefined
 
 var bar = new A();
-console.log(bar); // {}
+bar; // {}
 
 ```
 
@@ -533,13 +533,35 @@ bar instanceof A; // true
 
 Whilst the <code>constructor</code> property implies by name that it is a reference to the function it was created from, this is not always the case. We'll see why shortly. The <code>instanceof</code> operator will lookup an object's constructor property and compare it against a specified constructor (see above).
 
-The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used?
+Before delving any further into the mechanics behind using a constructor function, let's look at an important detail of function definition. When a function is declared, the function object that is created as a result has a <code>prototype</code> property - an empty object - that is automatically created. It is this property that facilitates prototypal inheritance. The example demonstrates how:
 
-### Prototype
+```javascript
+function A(){}
+var foo = new A();
+foo.bar;  // undefined
+A.prototype.bar = "foobar";
+foo.bar; // foobar
 
-Functions are objects. They can have properties and methods like any other object. But despite that it's useful in some contexts to think of objects and functions as two different things and as the two building blocks of JavaScript. 
+```
 
-When a function is declared, the function object that is created as a result has a <code>prototype</code> property - an empty object - that the JavaScript engine creates and attaches to it. It is this property that facilitates prototypal inheritance. The <code>prototype</code> remains benign in normal function usage, it's only when inheritance is required that it becomes the facilitator. 
+In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property.  
+
+
+The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor.
+
+```javascript
+function A(){}
+
+var foo = new A();  // foo is an instance of A
+```
+
+This instance is linked to its constructor in a number of ways. Firstly it has a <code>constructor</code> property as previously mentioned which points, in the above example, to A. 
+
+linked to prototype
+this context
+returns this
+
+
 
 
 

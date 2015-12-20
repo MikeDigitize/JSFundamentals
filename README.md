@@ -523,7 +523,7 @@ bar; // {}
 
 ```
 
-### The constructor
+### The Constructor property
 
 A function always returns. Without an explicit return statement a function returns <code>undefined</code> which is why in the above <code>foo</code> logs as <code>undefined</code>. When called with <code>new</code> however a new object - the new instance - is returned. This object has a <code>constructor</code> property. 
 

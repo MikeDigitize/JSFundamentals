@@ -647,7 +647,7 @@ pEvts.remove("click");  // removes click listener
 
 ```
 
-The above extends the <code>GetEl</code> function by adding in two new methods (to add and remove event listeners) and one new property which keeps a record of any event listeners added so they can be removed if needs be. They important part of this code as far as prototypal inheritance is concerned is this line:
+The above extends the <code>GetEl</code> function by adding in two new methods (to add and remove event listeners) and one new property which keeps a record of any event listeners added so they can be removed if needs be. The important part of this code as far as prototypal inheritance is concerned is this line:
 
 ```javascript
 AddEvents.prototype = new GetEl();
@@ -683,6 +683,8 @@ function Foo(name) {
 
 var foo = Foo("foo"); // { name : "foo" }
 var bar = Foo("bar"); // { name : "bar" }
+foo.getName();  // foo
+bar.getName();  // bar
 foo === bar;  // false
 
 ```

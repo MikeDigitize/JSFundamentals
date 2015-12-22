@@ -593,23 +593,84 @@ Constructors created to provide a simple piece of functionality can be extended 
 ```
 
 ```javascript
-function GetEl(selector) {
-  let elements = document.querySelectorAll(selector);
-  this.DOM = !elements.length ? undefined : elements.length === 1 ? elements[0] : Array.from(elements);
-}
+function GetEl(){}
+
+GetEl.prototype.setDOM = function(selector) {
+  this.DOM = Array.from(document.querySelectorAll(selector));
+};
 
 GetEl.prototype.getDOM = function() {
   return this.DOM;
 };
 
-var p = new GetEl("p");
+var p = new GetEl();
+p.setDOM("p");
 p.getDOM(); // array of p tags
+
+```
+
+The above is an example of a constructor that gets and sets a DOM element. This is common behaviour so it makes sense for it to be wrapped in a re-usable function. Something else that is common behaviour is adding and removing event listeners to DOM elements. So wouldn't it be useful if we could extend the above to accomodate event handling? Consider the following: 
+
+```javascript
+function AddEvents(){
+  this.events = {};
+}
+
+AddEvents.prototype = new GetEl();
+
+AddEvents.prototype.add = function(evt, fn, capture) {
+  capture = capture ? capture : false; 
+  this.events[evt] = [];
+  this.DOM.forEach(el => {
+    let listener = { 
+      el : el,
+      evt : evt, 
+      fn : fn, 
+      capture : capture 
+    };
+    el.addEventListener(evt, fn, capture);
+    this.events[evt].push(listener);
+  }); 
+}
+
+AddEvents.prototype.remove = function(evt) {
+  this.events[evt].forEach(listener => {
+    listener.el.removeEventListener(listener.evt, listener.fn, listener.capture);
+  });
+  this.events[evt] = [];
+}
+
+var pEvts = new AddEvents();
+pEvts.setDOM("p");  // inherited from GetEl
+pEvts.add("click", () => console.log("click")); // adds click event to all p tags
+pEvts.remove("click");  // removes click listener
+
+```
+
+The above extends the <code>GetEl</code> function by adding in two new methods (to add and remove event listeners) and one new property which keeps a record of any event listeners added so they can be removed if needs be. They important part of this code as far as prototypal inheritance is concerned is this line:
+
+```javascript
+AddEvents.prototype = new GetEl();
+
+```
+
+This line sets the prototype of <code>AddEvents</code> to a new instance of <code>GetEl</code>, which means the <code>getDOM</code> and <code>setDOM</code> methods and <code>DOM</code> property of <code>GetEl</code> are now available to any new instance of <code>AddEvents</code>. This, in the above example, is vital as <code>AddEvents</code> is written specifically to use these internals.
+
+By setting the prototype of <code>AddEvents</code> to point at the prototype of <code>GetEl</code> we have created a link between the two constructors. We can continue to add to the prototype of <code>AddEvents</code> without affecting <code>GetEl</code> as prototypal inheritance flows downwards, not upwards. This means however that when we add to the prototype of <code>GetEl</code>, any instances of <code>AddEvents</code> will automatically inherit this new property. Consider the following:
+
+```javascript
+GetEl.prototype.removeDOM = function() {
+  let reset;
+  this.DOM = reset;
+};
+
+pEvts.removeDOM();  // available through prototypal inheritance
 
 ```
 
 ### Factories
 
-A factory is any function that returns an object. Prototypal inheritance can produce factories. When a constructor function is invoked with the <code>new</code> keyword, it returns an object. This forces functions to behave differently than they usually would, such as returning things (objects) that aren't explicitly returned. But what if we used standard functions that returned objects?
+A factory is any function that returns an object. Prototypal inheritance can produce factories. When a constructor function is invoked with the <code>new</code> keyword, it returns an object. This forces functions to behave differently than they usually would when called, for example they returning things (objects) that aren't explicitly returned. But what if we used standard functions that returned objects instead of constructors and omitted the <code>new</code> keyword?
 
 ```javascript
 function Foo(name) {
@@ -626,7 +687,7 @@ foo === bar;  // false
 
 ```
 
-Factory functions are great for creating objects that don't need inheritance because they won't be extended. The above differs from instances created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from 
+Factory functions are great for creating objects that don't need inheritance because they won't be extended. The above differs from instances created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from <code>Object</code> and not <code>Foo</code>. So adding anything to the prototype of <code>Foo</code> will have no effect on any instances of it because there is no link between it and the object it returns.
 
 
 linked to prototype

@@ -224,7 +224,7 @@ foo.sayName();  // mike
 
 ```
 
-The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, refers to the instance of the constructor. It can therefore be used to set values specific to that instance. Prototypal inheritance will be covered in alater chapter.
+The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, refers to the instance of the constructor. It can therefore be used to set values specific to that instance. Prototypal inheritance will be covered in a later chapter.
 
 The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. Context can be explicitly set in four different ways, as of ES6.
 
@@ -244,7 +244,7 @@ foo.call(obj);  // foo
 
 ```
 
-In the above the function foo returns a reference to <code>this.bar</code>. There is a variable <code>bar</code> defined in the global scope. There's also a variable <code>obj</code>; an object with a property also named <code>bar</code>. If we were to call foo without the use of <code>call</code>, as its call site is the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. 
+In the above the function foo returns a reference to <code>this.bar</code>. There is a variable <code>bar</code> defined in the global scope. There's also a variable <code>obj</code> - an object with a property also named <code>bar</code>. If we were to call foo without the use of <code>call</code>, as its call site is the global scope <code>this</code> would refer to the global object and so the global variable <code>bar</code> would be returned. 
 
 In the example above however foo is executed using <code>call</code>. <code>call</code> and <code>apply</code> can explicilty define the context of <code>this</code> within the function they're called on. Context is set to the first argument passed into both. In the above example foo is called using <code>call</code> and the context is set to the variable <code>obj</code>. The following example demonstrates how <code>call</code> takes precedence over the default context rule and sets the context of <code>this</code> to the global object and not the call site.
 
@@ -290,9 +290,9 @@ Bind is another method on the function prototype. The difference between <code>b
 
 ```javascript
 function callback() {
-    console.log(this.name); // Mike
+    console.log(this.name);
 }
-setTimeout(callback.bind({ name : "Mike" }), 1000);
+setTimeout(callback.bind({ name : "Mike" }), 1000); // Mike
 
 ```
 
@@ -307,13 +307,18 @@ greetMike();  // Howdy Mike
 
 ```
 
-It is important to note that bind (and call and apply) cannot be used on function literals, they must be used only on a reference to the function. Call and apply, as they both execute the function they're called on, are applied directly to the function reference, whilst with bind the bound function must be assigned to a new reference. When this reference to the bound function is called the new binding rules will take effect. To illustrate this, consider the following:
+It is important to note that bind (and call and apply) cannot be used on function literals that aren't supplied as arguments, they must be used only on a reference to the function. Call and apply, as they both execute the function they're called on, are applied directly to the function reference, whilst with bind the bound function must be assigned to a new reference so it can be called. When this reference to the bound function is called the new binding rules will take effect. To illustrate this, consider the following:
 
 ```javascript
 // syntax error
 function foo() {
   return this.name;
 }.bind({ name : "foo" });
+
+// this is ok as the function literal is an argument
+setTimeout(function() {
+  console.log(this.name);
+}.bind({ name : "foo" }), 1000);
 
 function foo() {
   return this.name;
@@ -328,6 +333,9 @@ foo.bind({ name : "foo" });
 // correct: bar is a reference to the bound function
 var bar = foo.bind({ name : "bar" });
 bar();  // bar
+
+// immediately calling the bound function would work too
+foo.bind({ name : "foo" })();
 
 ```
 
@@ -365,7 +373,7 @@ bar.timer();
 
 ```
 
-By using a fat arrow function the context of <code>this</code> is preserved to be that of its parent, which is the timer function on the object bar, meaning the <code>foo</code> property would be looked up against bar, not the global object. You can think of this behaviour in fat arrows to be the equivalent of using bind. The setTimeouts in the above example could be written in either of the following ways to achieve the same thing:
+By using a fat arrow function the context of <code>this</code> is preserved to be that of its parent, which is the timer function on the object bar, meaning the <code>foo</code> property would be looked up against bar, not the global object. You can think of the behaviour of fat arrow functions to be the equivalent of using bind. The setTimeouts in the above example could be written in either of the following ways to achieve the same thing:
 
 ```javascript
 // equivalents
@@ -382,10 +390,10 @@ setTimeout(function() {
 What actually happens behind the scenes is not the same as using bind however. In fact the binding of this does not happen at all in a fat arrow function. There is no <code>this</code> in a fat arrow, so context remains that of its parent.
 
 ### Summary
-<code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and is set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.
+Context or <code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.
 
 ## Closures
-Understanding closures is something that can only really be done after understanding lexical scoping. Take the following example:
+Understanding closures is something that can only really be done when aware of how lexical and dynamic scoping in JavaScript work. Take the following example:
 
 ```javascript
 function bar() {
@@ -399,27 +407,27 @@ bar();  // a
 
 ```
 
-In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine will look up <code>a</code> against the scope of foo. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and then is able to log its value. This is, in very simple terms, a closure. The function foo has closed over the function bar (and anything in bar's parent scope, and so on until it reaches the global scope) and retains access to any variables in its scope.
+In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine looks up <code>a</code> in its immediate scope through its variable environment. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and can log its value. This is, in very simple terms, a closure. The function foo has closed over the scope of the function bar (and anything in bar's parent scope, and so on until it reaches the global scope) and retains access to any variables in its scope.
 
 The code above might help illustrate closures in their most simple form but it doesn't demonstrate their usefulness as a pattern, not without a small modification. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
 
 ```javascript
-function foo() {
-    var a = "foo";
-    function bar() {
+function bar() {
+    var a = "bar";
+    function foo() {
         return a;
     }
-    return bar;
+    return foo;
 }
 
-var bar = foo();
-bar();  // foo
+var foo = bar();
+foo();  // bar
 
 ```
 
-In this example the function bar is returned from the function foo. The variable <code>a</code> is lexically scoped within foo and any descendant scopes. It is not available outside of the scope of foo. However, by creating a variable <code>bar</code> in the global scope and assigning it to the return value of foo, which is a function, when we call that function we have access to <code>a</code>, even though the call is made outside of the lexical scope of <code>a</code>.
+In this example the function foo is returned from the function bar. The variable <code>a</code> is lexically scoped to foo and any descendant scopes. It's not available outside of the scope of bar. However, by creating a variable <code>foo</code> in the global scope and assigning it to the return value of bar, which is a function, when we call that function we get access to <code>a</code>, even though the call is made outside of the lexical scope of <code>a</code>.
 
-This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is accessible at runtime even if the reference is made outside of the scope it was defined in. In the above the function foo has returned and is no longer in use, yet closures still allow access to values defined inside them. To help illustrate a more practical use of closures consider the following piece of code;
+This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is accessible at runtime even if the reference is made outside of the scope it was defined in. This ability is provided by the variable environment created at runtime when <code>bar</code> is called. In the above the function <code>bar</code> has returned and is no longer in use, yet closures still allow access to values defined inside functions that have returned. To help illustrate a more practical use of closures consider the following piece of code;
 
 ```javascript
 function percentage(percent) {
@@ -433,7 +441,7 @@ vat(30);  // 6
 
 ```
 
-The function <code>percentage</code> calculates the percentage of a number. The percentage is determined by the value of the argument it accepts. Its return value however is not the calculated answer - how could it be, at this point there is no value to calculate against - it is a function. It is this returned function that accepts a value to calculate the percentage of. 
+The function <code>percentage</code> calculates the percentage of a number. The percentage is determined by the value of the argument it accepts. Its return value however is not the calculated answer - how could it be? At this point there is no value to calculate against - the return value is a function. It is this returned function that accepts the value to calculate the percentage of. 
 
 What has happened is the returned function has closed over the scope of its parent. At compilation time the value of <code>percent</code> is undefined, but this doesn't matter - the returned function still has access to its reference through scope. When the percentage function is called the value it gets called with defines <code>percent</code>, essentially pre-loading the returned function with one of the two values needed to make the calculation. Now when the returned function is called, it calculates the pre-loaded percent of the value it's passed. This technique is often referred to as partial application or currying and allows functions like percentage to be re-used over and over producing new functions pre-loaded with different values.
 
@@ -448,7 +456,7 @@ half(100);  // 50
 
 ### IIFE
 
-It is possible to create closure like effects at runtime through the use of IIFEs (Immediately Invoked Function Expressions). An IIFE is a function wrapped in an expression and immediatley called<code>(function(){})();</code>. Whereas with closures, variables are able to be retrieved through reference, IIFEs close around values (not references to a value), essentially preserving a snapshot of the value at the point of execution. To illustrate that, consider the following example:
+It is possible to create closure like effects at runtime through the use of IIFEs (Immediately Invoked Function Expressions). An IIFE is a function wrapped in an expression and immediatley called<code>(function(){})()</code>. Whereas with closures, variables are able to be retrieved through reference, IIFEs run immediately so close around the value at the time of execution, essentially preserving a snapshot of the value at that point within the script. To illustrate that, consider the following example:
 
 ```javascript
 var a = 1;
@@ -460,7 +468,7 @@ console.log(b); // 2
 
 ```
 
-In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. As the expression is immediately evaluated its value at time of execution is all that matters. This is great, however not all that useful. This is because the above code is synchronous. Changes to <code>a</code> do not happen until the expression finishes executing. To help demonstrate how useful IIFEs can be, consider the following asynchronous example:
+In the above IIFE, the variable <code>a</code> is passed in as an argument and also referenced directly within the function body. As the expression is immediately evaluated its value at time of execution is all that matters. This helps demonstrate how IIFEs work but is not all that useful as a pattern. This is because the above code is synchronous. Changes to <code>a</code> do not happen until the expression has been called. To help demonstrate how useful IIFEs can be, consider the following asynchronous example:
 
 ```html
 <button class="btn">Click me!</button>
@@ -472,13 +480,13 @@ In the above IIFE, the variable <code>a</code> is passed in as an argument and a
 var btns = document.querySelector(".btn");
 for(var i = 0; i < btns.length; i++) {
   btns[i].addEventListener("click", () => { 
-    console.log(`I am button ${i}`);
+    console.log(`I am button ${i}`);  // es6 template strings will be covered later
   }, false);
 }
 
 ```
 
-If the above, each button on click would be expected to log out its index <code>i</code>. What actually happens is that all will log the current value of <code>i</code>, which in the above after the loop finishes would be <code>2</code>. The reason for this is each callback function retains only a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. This example can be fixed through the use of an IIFE:
+If the above, each button on click would be expected to log out its index <code>i</code>. What actually happens is that all will log the value of <code>i</code> at the time of a click, which in the above after the loop finishes would always be <code>2</code>. The reason for this is each callback function retains only a reference to the same variable <code>i</code>, the value of it at assignment time is not remembered. This example can be fixed through the use of an IIFE:
 
 ```javascript
 var btns = document.querySelector(".btn");

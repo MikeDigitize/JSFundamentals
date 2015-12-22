@@ -548,18 +548,16 @@ foo.bar; // foobar
 
 ```
 
-In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, which demonstrates that there is an implicit link between constructor and instance behind the scenes.   
-
-
-The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor.
+In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, which demonstrates the implicit link between constructor and instance behind the scenes. The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance has an implicit link to the prototype of its constructor.
 
 ```javascript
 function A(){}
 var foo = new A();  // foo is an instance of A
+A.prototype === foo.constructor.prototype;  // true
 
 ```
 
-The context of the constructor is set to the new instance and that context is set as the constructor's return value. The following will likely explain this more clearly:
+Secondly, the context of <code>this</code> in the constructor is set to the new instance, and thirdly that context is set as the constructor's return value. The following will likely explain this more clearly:
 
 ```javascript
 function Greet(greeting) {
@@ -582,6 +580,54 @@ hi = Greet.call(hi, "hi");
 hi.greeting;  // hi
 
 ```
+
+### Extending prototypes
+
+Constructors created to provide a simple piece of functionality can be extended to create more complex pieces of functionality. Consider the following:
+
+```html
+<p>This</p>
+<p>is</p>
+<p>Text</p>
+
+```
+
+```javascript
+function GetEl(selector) {
+  let elements = document.querySelectorAll(selector);
+  this.DOM = !elements.length ? undefined : elements.length === 1 ? elements[0] : Array.from(elements);
+}
+
+GetEl.prototype.getDOM = function() {
+  return this.DOM;
+};
+
+var p = new GetEl("p");
+p.getDOM(); // array of p tags
+
+```
+
+### Factories
+
+A factory is any function that returns an object. Prototypal inheritance can produce factories. When a constructor function is invoked with the <code>new</code> keyword, it returns an object. This forces functions to behave differently than they usually would, such as returning things (objects) that aren't explicitly returned. But what if we used standard functions that returned objects?
+
+```javascript
+function Foo(name) {
+  return {
+    getName : function() {
+      return name || "Unknown";
+    }
+  }
+}
+
+var foo = Foo("foo"); // { name : "foo" }
+var bar = Foo("bar"); // { name : "bar" }
+foo === bar;  // false
+
+```
+
+Factory functions are great for creating objects that don't need inheritance because they won't be extended. The above differs from instances created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from 
+
 
 linked to prototype
 this context

@@ -3,7 +3,11 @@ A guide to JavaScript.
 
 ## The JavaScript Compiler
 
-JavaScript is a compiled programming language. What does that mean? It means JavaScript code is compiled by a JavaScript engine first before it is executed. Say you've written some code and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code, then executes it. In this compilation stage the JavaScript engine runs through the code and compiles it into machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when lexical scope is defined.
+JavaScript is a compiled programming language. 
+
+What does that mean? 
+
+It means JavaScript code gets compiled by a JavaScript engine first before it's executed. So say you've written some JavaScript and you run it in Google's Chrome web browser, firstly the JavaScript engine that Chrome uses - v8 - compiles the code and then immediately executes it. In this compilation stage the JavaScript engine runs through the code and compiles it into machine code, performing all manner of optimisation techniques along the way. It is at this time, during compilation, when scope is defined.
 
 ## Lexical scope
 Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source. Pre ES6, variables were scoped either to the global scope or to a function scope. 
@@ -32,7 +36,7 @@ function foo() {
 console.log(bar);
 ```
 
-In JavaScript things are declared either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two, other than the way they're declared (see below), is in the way the compiler treats them. The next section covers this.
+In JavaScript you describe your data and your data handlers either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two, other than the way they're declared (see below), is in the way the compiler treats them.
 
 ```javascript
 // declaration
@@ -45,7 +49,7 @@ var foo = function() {}
 
 ### Let and const
 
-ES6 introduced two new ways for variables to be declared - <code>const</code> and <code>let</code>. These both have different scoping criteria to var and function, and are also handled differently by the compiler (see the next section for an explanation as to how). Const and let are lexically block scoped which means they are available only within the block <code>{ }</code> they are declared in.
+ES6 introduced two new ways for variables to be declared - <code>const</code> and <code>let</code>. These both have different scoping criteria to var and function, and are also handled differently by the compiler. Const and let are lexically block scoped which means they are available only within the block <code>{ }</code> they are declared in.
 
 ```javascript
 for (let i = 0; i < 5; i++) {
@@ -58,7 +62,7 @@ console.log(i);
 ```
 
 ### Summary
-Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compile stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
+Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compilation stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
 
 ## Hoisting
 The compiler hoists variables and functions in your code to the top of the scope they are declared in. Take the following code:
@@ -77,7 +81,7 @@ The compiler runs through the code and hoists the variables and functions to the
 
 ```javascript
 
-// after compiler
+// post compiler
 function b() {
   return "foo";
 }
@@ -146,7 +150,7 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is scope created whenever a function is called, and is referred to as its variable <code>environment</code>, or prior to ES5, <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
 
-This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If not found it looks to its parent, and then its parent's parent until it reaches the global scope where if it's not found the engine will throw a reference error.
+This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If not found it looks to its parent, and then its parent's parent until it reaches the global scope where, if it's not found, the engine will throw a reference error.
 
 Consider the following:
 
@@ -163,11 +167,11 @@ bar();  // foobar
 
 ```
 
-The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - its <code>environment</code>, which holds anything in its immediate and lexical scopes. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
+The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - its <code>environment</code>, which holds anything in its lexical scope. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
 
 ### Summary
 
-Lexical scope is defined at compile time. At runtime when a function call is made, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical scope. When asked to lookup a variable referenced within the function, the engine first checks against its immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent scope of the function until it reaches the global scope. The reference to these parent scopes is held in the <code>environment</code> which, as it's created and defined at runtime, is known as dynamic scoping.
+At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical scope. When asked to lookup a variable referenced within the function, the engine first checks against its immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and is known as dynamic scoping.
 
 ## Context
 
@@ -186,9 +190,9 @@ bar();
 
 ```
 
-Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variables it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore has a reference to the variable <code>a</code>.
+Context is defined based on the location the function was called from - known as the call site. In the above example the function <code>bar</code> is called in the global scope and attempts to log a variable attached to <code>this</code>. The variable it attempts to log - <code>a</code> - has been defined in the global scope. Since the function was called in the global scope, <code>this</code> refers to the global object and therefore logs <code>a</code> from the global scope.
 
-This is known as the default context rule. Be aware that in strict mode the default context rule is ignored if the scope is global and <code>this</code> will be undefined. Trying to access a property on undefined obviously will throw an error. To see how the default rule changes according to the call site, take the following example:
+This is known as the default context rule. Be aware that in strict mode the default context rule is ignored if the scope is global and <code>this</code> will be undefined. To see how the default rule changes according to the call site, take the following example:
 
 ```javascript
 function bar() {
@@ -202,23 +206,25 @@ var foo = {
 foo.b();
 ```
 
-Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a property named <code>a</code>. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and <code>a</code> is looked up against this call site and not the global object as it was previously.
+Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a property named <code>a</code>. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and therefore <code>a</code> is looked up against <code>foo</code> and not the global object as it was previously.
 
-When determining context, the default rule is the last to be considered. Take the following example of a constructor function:
+When determining context, the default rule is the last to be considered. Take the following example of a constructor function (constructor functions are covered in detail later):
 
 ```javascript
 function Foo(name) {
     this.name = name;
 }
+
 Foo.prototype.sayName = function() {
   return this.name;
 };
+
 var foo = new Foo("mike");
 foo.sayName();  // mike
 
 ```
 
-The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, refers to the instance of the constructor. It can therefore be used to set values specific to that instance.
+The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, refers to the instance of the constructor. It can therefore be used to set values specific to that instance. Prototypal inheritance will be covered in alater chapter.
 
 The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. Context can be explicitly set in four different ways, as of ES6.
 

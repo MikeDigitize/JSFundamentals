@@ -750,6 +750,15 @@ tableForTwo.getTip(); // 14
 In the above <code>Bill</code> is a constructor that creates instances capable of returning the total of a bill and the amount to tip. Its prototype is composed using two global functions <code>Percent</code> and <code>Total</code>. Consider the following code that calculates income tax which requires similar functionality to that of <code>Bill</code>, but not the same. Inheritance wouldn't work in this scenario, but fortunately composition allows for a more granular approach and so does work.
 
 ```javascript
+var work = [{ 
+    title : "freelance", 
+    amounts : [100, 340, 700] 
+  }, { 
+    title : "contracts", 
+    amounts : [500, 770, 350] 
+  }
+];
+
 function IncomeTax(){}
 
 IncomeTax.prototype.jobs = function(jobs) {
@@ -761,7 +770,9 @@ IncomeTax.prototype.jobs = function(jobs) {
 };
 
 IncomeTax.prototype.total = function() {
-  this.totalIncome = Object.keys(this.jobRecord).map(job => this.jobRecord[job].total).reduce((total, job) => total += job, 0);
+  this.totalIncome = Object.keys(this.jobRecord)
+                      .map(job => this.jobRecord[job].total)
+                      .reduce((total, job) => total += job, 0);
 };
 
 IncomeTax.prototype.taxToPay = function() {
@@ -769,7 +780,7 @@ IncomeTax.prototype.taxToPay = function() {
 };
 
 var myTax = new IncomeTax();
-myTax.jobs([{ title : "freelance", amounts : [100, 340, 700] }, { title : "contracts", amounts : [500, 770, 350] }]);
+myTax.jobs(work);
 myTax.total();  // 2760
 myTax.taxToPay(); // 607.2
 

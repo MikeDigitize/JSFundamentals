@@ -518,13 +518,13 @@ As <code>i</code> is block scoped it is only available within the for loop block
 
 Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to that value. 
 
-IIFEs work in a similar way, only they close over values not references to values. They are evaluated at runtime as expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
+IIFEs work in a similar way, only they close over the current value of the variable they reference at runtime. They are expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
 
 ## Prototypal inheritance
 
-JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that functions and objects should be thought of as two separate constructs whcih essentially form the building blocks of JavaScript. JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. 
+JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that functions and objects should be thought of as two separate constructs; two constructs which essentially form the building blocks of JavaScript. JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. 
 
-A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a <code>prototype</code> which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
+A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. You'd think this is a reference to the constructor function which created the object but alas it isn't quite that simple. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
 
 ```javascript
 function A(){}
@@ -547,11 +547,11 @@ bar instanceof A; // true
 
 ```
 
-Whilst the <code>constructor</code> property implies by name that it is a reference to the function it was created from, this is not always the case. We'll see why shortly. Any function in JavaScript can be used as a constructor, but it will only be of any use in terms of inheritance if some additional setup has been carried out to the function beforehand. Before delving any further into the mechanics behind the constructor, let's look at an important detail of function definition. 
+Whilst the <code>constructor</code> property implies by name that it is a reference to the function it was created from, this is not always the case. We'll see why shortly. Any function in JavaScript can be used as a constructor function, but it will only be of any use in terms of inheritance if some additional setup has been carried out to the function beforehand. Before delving any further into the mechanics behind the constructor, let's look at an important detail of function definition. 
 
 ### The Prototype property
 
-When a function is declared, the function object that is created as a result has a <code>prototype</code> property - an empty object - that is automatically created. It is this property that facilitates prototypal inheritance. The example demonstrates how:
+When a function is declared, the function object that is created as a result gets a <code>prototype</code> property - an empty object - automatically attached to it. It is this property that facilitates prototypal inheritance. The example demonstrates how:
 
 ```javascript
 function A(){}
@@ -562,22 +562,25 @@ foo.bar; // foobar
 
 ```
 
-In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, which demonstrates the implicit link between constructor and instance behind the scenes. The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance has an implicit link to the prototype of its constructor.
+In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating an implicit link between constructor and instance, behind the scenes. The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance has an implicit link to the prototype of its constructor. Properties defined on the constructor's prototype do not appear on the instance, but can be referenced as if they were.
 
 ```javascript
 function A(){}
 var foo = new A();  // foo is an instance of A
 A.prototype === foo.constructor.prototype;  // true
+A.bar = "bar";  //  static property on the constructor
+A.prototype.foobar = "foobar";  // accessible now on any instance of A
+foo.foobar; // foobar
 
 ```
 
-Secondly, the context of <code>this</code> in the constructor is set to the new instance, and thirdly that context is set as the constructor's return value. The following will likely explain this more clearly:
+Secondly, the context of <code>this</code> in the constructor points to the new instance, and thirdly that context is implicitly set as the constructor's return value. If that's not clear, the following will likely explain it better:
 
 ```javascript
 function Greet(greeting) {
-  // `this` is set to the instance of Greet
+  // `this` is set to any instance of Greet that's being instantiated
   this.greeting = greeting;
-  // implicitly returns the instance
+  // implicitly returns the instance despite no return statement
 }
 
 var hi = new Greet("hi");
@@ -597,9 +600,10 @@ hi.greeting;  // hi
 
 ### Extending prototypes
 
-Constructors created to provide a simple piece of functionality can be extended to create more complex pieces of functionality. Consider the following:
+Constructors created to provide a simple piece of functionality can be extended to create more complex pieces of functionality. Consider the following example of a constructor that gets and sets a DOM element:
 
 ```html
+<!-- DOM -->
 <p>This</p>
 <p>is</p>
 <p>Text</p>
@@ -607,6 +611,7 @@ Constructors created to provide a simple piece of functionality can be extended 
 ```
 
 ```javascript
+// constructor
 function GetEl(){}
 
 GetEl.prototype.setDOM = function(selector) {
@@ -623,7 +628,7 @@ p.getDOM(); // array of p tags
 
 ```
 
-The above is an example of a constructor that gets and sets a DOM element. This is common behaviour so it makes sense for it to be wrapped in a re-usable function. Something else that is common behaviour is adding and removing event listeners to DOM elements. So wouldn't it be useful if we could extend the above to accomodate event handling? Consider the following: 
+This is common behaviour so it makes sense for it to be wrapped in a re-usable function. It's important to recognise the reduction in memory consumption that prototypal inheritance offers. Any new instances of the above will be able to retrieve DOM elements but the function that sets the DOM element is only defined once, on the constructor's prototype. Every instance does not carry its own version of that function, they all just point to the one on the prototype therefore saving memory. Something else that is common behaviour, besides retrieving DOM elements, is adding and removing event listeners to DOM elements. So wouldn't it be useful if we could extend the above to accomodate event handling? Consider the following: 
 
 ```javascript
 function AddEvents(){
@@ -657,7 +662,7 @@ AddEvents.prototype.remove = function(evt) {
 var pEvts = new AddEvents();
 pEvts.setDOM("p");  // inherited from GetEl
 pEvts.add("click", () => console.log("click")); // adds click event to all p tags
-pEvts.remove("click");  // removes click listener
+pEvts.remove("click");  // removes click listener from all p tags
 
 ```
 
@@ -668,9 +673,9 @@ AddEvents.prototype = new GetEl();
 
 ```
 
-This line sets the prototype of <code>AddEvents</code> to a new instance of <code>GetEl</code>, which means the <code>getDOM</code> and <code>setDOM</code> methods and <code>DOM</code> property of <code>GetEl</code> are now available to any new instance of <code>AddEvents</code>. This, in the above example, is vital as <code>AddEvents</code> is written specifically to use these internals.
+This line sets the prototype of <code>AddEvents</code> to a new instance of <code>GetEl</code>, which means the <code>getDOM</code> and <code>setDOM</code> methods and <code>DOM</code> property of <code>GetEl</code> are now available, via its prototype, to any new instance of <code>AddEvents</code>. This, in the above example, is vital as <code>AddEvents</code> is written specifically to use the internals of <code>GetEl</code>.
 
-By setting the prototype of <code>AddEvents</code> to point at the prototype of <code>GetEl</code> we have created a link between the two constructors. We can continue to add to the prototype of <code>AddEvents</code> without affecting <code>GetEl</code> as prototypal inheritance flows downwards, not upwards. This means however that when we add to the prototype of <code>GetEl</code>, any instances of <code>AddEvents</code> will automatically inherit this new property. Consider the following:
+By setting the prototype of <code>AddEvents</code> to point at the prototype of <code>GetEl</code> we have created a link between the two constructors. We can continue to add to the prototype of <code>AddEvents</code> without affecting <code>GetEl</code> as prototypal inheritance flows downwards, not upwards. This means however that when we add to the prototype of <code>GetEl</code>, any instances of <code>AddEvents</code> will automatically inherit any new properties. Consider the following:
 
 ```javascript
 GetEl.prototype.removeDOM = function() {
@@ -678,13 +683,15 @@ GetEl.prototype.removeDOM = function() {
   this.DOM = reset;
 };
 
-pEvts.removeDOM();  // available through prototypal inheritance
+pEvts.removeDOM();  // available on an instance of AddEvents through prototypal inheritance
 
 ```
 
+Prototypal inheritance is not the only way to create objects of course.
+
 ### Factories
 
-A factory is any function that returns an object. Prototypal inheritance can produce factories. When a constructor function is invoked with the <code>new</code> keyword, it returns an object. This forces functions to behave differently than they usually would when called, for example they returning things (objects) that aren't explicitly returned. But what if we used standard functions that returned objects instead of constructors and omitted the <code>new</code> keyword?
+A factory is any function that returns an object. Constructor functions are factories. When a constructor function is invoked with the <code>new</code> keyword, it returns an object. This forces functions to behave differently than they usually would when called, for example, as we saw earlier, they return things (objects) that aren't explicitly returned. But what if we used standard functions that returned objects instead of constructors and omitted the <code>new</code> keyword?
 
 ```javascript
 function Foo(name) {
@@ -703,12 +710,13 @@ foo === bar;  // false
 
 ```
 
-Factory functions are great for creating objects that don't need inheritance because they won't be extended. The above differs from instances created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from <code>Object</code> and not <code>Foo</code>. So adding anything to the prototype of <code>Foo</code> will have no effect on any instances of it because there is no link between it and the object it returns.
+In the above the factory function <code>Foo</code> returns an object that, through a closure, retains a reference to the <code>name</code> parameter passed into <code>Foo</code> when it's called. 
+
+Factory functions are great for creating objects that don't need inheritance. They can't be extended. They return instances that differ from those created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from <code>Object</code> and not <code>Foo</code>. So adding anything to the prototype of <code>Foo</code> will have no effect on any instances of it because there is no prototypal link between it and the object it returns.
+
+### Composition
 
 
-linked to prototype
-this context
-returns this
 
 
 

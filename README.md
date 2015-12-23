@@ -3,7 +3,7 @@ A guide to JavaScript.
 
 ## The JavaScript Compiler
 
-JavaScript is a compiled programming language which means any JavaScript code that's ran in a JavsScript environment first gets compiled by the engine before it's executed. In this compilation stage the JavaScript is compiled down into machine code with all manner of optimisations carried out on it to help performance. It is at this time, during compilation, when scope is defined.
+JavaScript is a compiled programming language which means any JavaScript code ran in a JavaScript environment, such as a browser or Node, first gets compiled by the engine before it's executed. In this compilation stage the JavaScript is compiled down into machine code with all manner of optimisations carried out on it to help performance. It is at this time, during compilation, when scope is defined.
 
 ## Lexical scope
 Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source. Pre ES6, variables were scoped either to the global scope or to a function scope. 

@@ -650,14 +650,14 @@ AddEvents.prototype.add = function(evt, fn, capture) {
     el.addEventListener(evt, fn, capture);
     this.events[evt].push(listener);
   }); 
-}
+};
 
 AddEvents.prototype.remove = function(evt) {
   this.events[evt].forEach(listener => {
     listener.el.removeEventListener(listener.evt, listener.fn, listener.capture);
   });
   this.events[evt] = [];
-}
+};
 
 var pEvts = new AddEvents();
 pEvts.setDOM("p");  // inherited from GetEl
@@ -715,6 +715,76 @@ In the above the factory function <code>Foo</code> returns an object that, throu
 Factory functions are great for creating objects that don't need inheritance. They can't be extended. They return instances that differ from those created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from <code>Object</code> and not <code>Foo</code>. So adding anything to the prototype of <code>Foo</code> will have no effect on any instances of it because there is no prototypal link between it and the object it returns.
 
 ### Composition
+
+Factory functions have an obvious limitation in that they don't support inheritance. But is inheritance always the best solution for sharing methods? When an instance inherits from a constructor's blueprint it inherits everything. But maybe it doesn't need everything. Maybe it only needs one or two methods or properties. If this is the case then there is an alternative to pure inheritance - composition. You can think of the difference between them as inheritance is when objects are defined based on what they are and composition is objects defined based on what they do. Consider the following:
+
+```javascript
+function Total(costs) {
+  return costs.reduce((total, cost) => total += cost, 0);
+}
+
+function Percent(percent, of) {
+  return Number((of / 100 * percent).toFixed(2));
+}
+
+function Bill() {}
+
+Bill.prototype.getTotal = function(costs) {
+  this.total = Total(costs);
+};
+
+Bill.prototype.getTip = function() {
+  this.tip = Percent(20, this.total);
+};
+
+var tableOfFour = new Bill();
+tableOfFour.getTotal([20,45,12,54,34,23,33,38,]); // 259
+tableOfFour.getTip(); 51.8
+
+var tableForTwo = new Bill();
+tableForTwo.getTotal([8,24,12,26]); // 70
+tableForTwo.getTip(); // 14
+
+```
+
+In the above <code>Bill</code> is a constructor that creates instances capable of returning the total of a bill and the amount to tip. Its prototype is composed using two global functions <code>Percent</code> and <code>Total</code>. Consider the following code that calculates income tax which requires similar functionality to that of <code>Bill</code>, but not the same. Inheritance wouldn't work in this scenario, but fortunately composition allows for a more granular approach and so does work.
+
+```javascript
+function IncomeTax(){}
+
+IncomeTax.prototype.jobs = function(jobs) {
+  this.jobRecord = jobs.reduce((record, job) => {
+    record[job.title] = {};
+    record[job.title].total = Total(job.amounts);
+    return record;
+  }, {});
+};
+
+IncomeTax.prototype.total = function() {
+  this.totalIncome = Object.keys(this.jobRecord).map(job => this.jobRecord[job].total).reduce((total, job) => total += job, 0);
+};
+
+IncomeTax.prototype.taxToPay = function() {
+  this.tax = Percent(22, this.totalIncome); // flat rate of 22% FTW!
+};
+
+var myTax = new IncomeTax();
+myTax.jobs([{ title : "freelance", amounts : [100, 340, 700] }, { title : "contracts", amounts : [500, 770, 350] }]);
+myTax.total();  // 2760
+myTax.taxToPay(); // 607.2
+
+```
+
+### Chaining
+
+As long as a function returns a function in some form it is able to be chained.
+
+```javascript
+function andOn(){ return { andOn : andOn } }
+var on = andOn();
+on.andOn().andOn().andOn().andOn(); // etc
+
+```
 
 
 

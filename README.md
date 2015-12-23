@@ -791,7 +791,11 @@ myTax.taxToPay(); // 607.2
 As long as a function returns a function in some form it is able to be chained.
 
 ```javascript
-function andOn(){ return { andOn : andOn } }
+function andOn(){ 
+  return { 
+    andOn : () => this 
+  } 
+}
 var on = andOn();
 on.andOn().andOn().andOn().andOn(); // etc
 

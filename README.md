@@ -714,13 +714,13 @@ foo === bar;  // false
 
 ```
 
-In the above the factory function <code>Foo</code> returns an object that, through a closure, retains a reference to the <code>name</code> parameter passed into <code>Foo</code> when it's called. The ability to return only what we want means that when creating factories, unlike in prototypal inheritance, we can make use of private properties. 
+In the above the factory function <code>Foo</code> returns an object that, through closure, retains a reference to the <code>name</code> parameter passed into <code>Foo</code> when it's called. The ability to return only what we want means that when creating factories, unlike in prototypal inheritance, we can make use of private properties. 
 
 Factory functions are great for creating objects that don't need inheritance. They can't be extended. They return instances that differ from those created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from <code>Object</code> and not <code>Foo</code>. So adding anything to the prototype of <code>Foo</code> will have no effect on any instances of it because there is no prototypal link between it and the object it returns.
 
 ### Composition
 
-Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything when perhaps it doesn't need everything. Maybe it only needs one or two methods or properties. With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. Consider the following:
+Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything when perhaps it doesn't need to. Maybe it only needs one or two methods or properties. With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. Consider the following:
 
 ```javascript
 function Total(costs) {
@@ -799,9 +799,11 @@ Greet.sayHi("Mike");  // Hello Mike
 
 ```
 
-### The Module Prototype Pattern
+The module pattern provides encapuslation and control over what is exposed publically. It is by nature a singleton as we will only ever need one instance of it and operate directly on that instance. We also don't have to assign a variable to its return value as we get that for free via the IIFE. As a result of these benefits the revealing module pattern is a very popular pattern.
 
-To emphasise the malleability of JavaScript, it's possible to re-engineer the prototype pattern into one that supports private properties. By default the <code>prototype</code> property of a function is an object, but we can change this by incorporating the revealing module pattern above.
+### The Revealing Prototype Pattern
+
+To emphasise the malleability of JavaScript, it's possible to re-engineer the prototype pattern into one that supports private properties. By default the <code>prototype</code> property of a function is an object, but we can change this by incorporating the revealing prototype pattern above.
 
 ```javascript
 function Greeting(){}
@@ -817,6 +819,8 @@ var foo = new Greeting();
 foo.sayHi("Mike");  // Hello Mike
 
 ```
+
+Greeting can still be extended through its prototype, however with this pattern it is preferable to include all necessary properties when the constructor is first defined, so each method can benefit from the encapsulation it provides. This extra ability makes the revealing prototype a very useful pattern.
 
 ### Summary
 

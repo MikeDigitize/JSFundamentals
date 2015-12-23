@@ -300,7 +300,7 @@ In the above, the callback function passed into setTimeout has its context set b
 
 ```javascript
 function greet(greeting) {
-    return greeting + " " + this.name;
+    return `${greeting} ${this.name}`;
 }
 var greetMike = greet.bind({ name : "Mike" }, "Howdy");
 greetMike();  // Howdy Mike
@@ -687,7 +687,15 @@ pEvts.removeDOM();  // available on an instance of AddEvents through prototypal 
 
 ```
 
-Prototypal inheritance is not the only way to create objects of course.
+Prototypal inheritance is a very useful pattern but there are a few limitations with it. Firstly, it doesn't allow for private properties - everything must be attached to the instance at instantiation or through the prototype, making all its properties publicly available. Secondly, when extending prototypes there is no mechanism to inherit only the methods or properties that are needed - extending means inheriting everything, which is not always ideal. Thirdly, there is its over reliance on <code>this</code> and the potential for that reference to be overwritten by one of the means discussed earlier in the context chapter, making code within potentially brittle. 
+
+### Summary
+
+Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from functions. Its facilitated through the use of a function - the constructor - and the <code>new</code> keyword. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance. 
+
+## JavaScript Design Patterns
+
+Prototypal inheritance is not the only way to create objects. With a language as flexible as JavaScript there are a multitude of alternatives available if prototypal inheritance does not fit the use case.
 
 ### Factories
 
@@ -710,13 +718,13 @@ foo === bar;  // false
 
 ```
 
-In the above the factory function <code>Foo</code> returns an object that, through a closure, retains a reference to the <code>name</code> parameter passed into <code>Foo</code> when it's called. 
+In the above the factory function <code>Foo</code> returns an object that, through a closure, retains a reference to the <code>name</code> parameter passed into <code>Foo</code> when it's called. The ability to return only what we want means that when creating factories, unlike in prototypal inheritance, we can make use of private properties. 
 
 Factory functions are great for creating objects that don't need inheritance. They can't be extended. They return instances that differ from those created with the <code>new</code> keyword for a number of ways, but most importantly - as <code>Foo</code> returns an object literal, any instances of <code>Foo</code> will inherit from <code>Object</code> and not <code>Foo</code>. So adding anything to the prototype of <code>Foo</code> will have no effect on any instances of it because there is no prototypal link between it and the object it returns.
 
 ### Composition
 
-Factory functions have an obvious limitation in that they don't support inheritance. But is inheritance always the best solution for sharing methods? When an instance inherits from a constructor's blueprint it inherits everything. But maybe it doesn't need everything. Maybe it only needs one or two methods or properties. If this is the case then there is an alternative to pure inheritance - composition. You can think of the difference between them as inheritance is when objects are defined based on what they are and composition is objects defined based on what they do. Consider the following:
+Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything when perhaps it doesn't need everything. Maybe it only needs one or two methods or properties. With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. Consider the following:
 
 ```javascript
 function Total(costs) {
@@ -747,18 +755,9 @@ tableForTwo.getTip(); // 14
 
 ```
 
-In the above <code>Bill</code> is a constructor that creates instances capable of returning the total of a bill and the amount to tip. Its prototype is composed using two global functions <code>Percent</code> and <code>Total</code>. Consider the following code that calculates income tax which requires similar functionality to that of <code>Bill</code>, but not the same. Inheritance wouldn't work in this scenario, but fortunately composition allows for a more granular approach and so does work.
+In the above <code>Bill</code> is a constructor that creates instances capable of returning the total of a bill and the amount to tip. Its prototype is composed using two global functions <code>Percent</code> and <code>Total</code>. Consider the following code that calculates income tax which requires similar functionality to that of <code>Bill</code>, but not the same. Inheritance wouldn't work in this scenario, but fortunately composition allows us to take only the bits we need an adapt them accordingly.
 
 ```javascript
-var work = [{ 
-    title : "freelance", 
-    amounts : [100, 340, 700] 
-  }, { 
-    title : "contracts", 
-    amounts : [500, 770, 350] 
-  }
-];
-
 function IncomeTax(){}
 
 IncomeTax.prototype.jobs = function(jobs) {
@@ -779,12 +778,53 @@ IncomeTax.prototype.taxToPay = function() {
   this.tax = Percent(22, this.totalIncome); // flat rate of 22% FTW!
 };
 
+var work = [{ title : "freelance", amounts : [100, 340, 700] }, { title : "contracts", amounts : [500, 770, 350] }];
 var myTax = new IncomeTax();
 myTax.jobs(work);
 myTax.total();  // 2760
 myTax.taxToPay(); // 607.2
 
 ```
+
+### The Revealing Module Pattern
+
+There are a multitude of patterns that combine one or more features from closures, prototypal inheritance, IIFEs, factories and composition to create objects in JavaScript. The revealing module pattern combines closure, IIFEs and factories. Take the following example:
+
+```javascript
+var Greeting = (function() {
+  var greet = "Hello";
+  function sayHi(person) {
+    return `${greet} ${person}`;
+  }
+  return { sayHi };
+})();
+
+Greet.sayHi("Mike");  // Hello Mike
+
+```
+
+### The Module Prototype Pattern
+
+To emphasise the malleability of JavaScript, it's possible to re-engineer the prototype pattern into one that supports private properties. By default the <code>prototype</code> property of a function is an object, but we can change this by incorporating the revealing module pattern above.
+
+```javascript
+function Greeting(){}
+Greeting.prototype = (function() {
+  var greet = "Hello";
+  function sayHi(person) {
+    return `${greet} ${person}`;
+  }
+  return { sayHi };
+})();
+
+var foo = new Greeting();
+foo.sayHi("Mike");  // Hello Mike
+
+```
+
+### Summary
+
+There are a plethora of possible ways to create objects in JavaScript, each with certain characteristics or idiosyncracies that give them specific advantages or disadvantages in relation to other patterns.
 
 ### Chaining
 

@@ -854,7 +854,7 @@ As of ES6 there are seven different data types in JavaScript -
 
 ### Primitives and Objects
 
-All types, except objects, are known as primitives. And all primitives are immutable values (values which are incapable of being changed). When creating a primitive as a type literal - i.e. without the use of its constructor - the primitive simply represents a value of that type in memory, therefore leaving a very small memory footprint. Consider the following:
+All types, except objects, are known as primitives. All primitive values are immutable (values that are incapable of being changed). When creating a primitive as a type literal - i.e. without the use of its constructor - the primitive simply represents a value of that type in memory, therefore leaving a very small memory footprint. Consider the following:
 
 ```javascript
 // primitive string
@@ -889,7 +889,7 @@ foobar; // Boolean { [[PrimitiveValue]]: true }
 
 ```
 
-The above demonstrates the difference in resulting value when declaring a variable with a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive however what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
+The above demonstrates the difference in resulting value when defining a variable as a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive. But what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
 
 When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access to static and prototypal properties. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
 
@@ -909,7 +909,7 @@ foo.bar;  // undefined
 
 ### Null and Undefined
 
-Null and Undefined are both types in JavaScript. The difference between the two is simply a case of implict or explicit declaration. Both are meant to represent a yet to be determined value. However, a null value has to be explicitly declared, it does not occur organically, unlike a value of undefined which is automatically when a variable is declared but not defined.
+Null and Undefined are both types in JavaScript. The difference between the two is simply a case of implict or explicit declaration. Both are meant to represent a yet to be determined value. However, a null value has to be explicitly declared, it does not occur organically, unlike a value of undefined which is automatically assigned to a variable that is declared but not defined.
 
 ```javascript
 // foo is declared but its value is yet to be determined
@@ -922,7 +922,7 @@ foo;  // null
 
 ```
 
-A common source of confusion between the two comes from the result of the <code>typeof</code> operator when used against them. Pre ES6 Undefined is recognised as a type but null, due to a bug in the ECMAScript implementation, is interpreted as an object.
+A common source of confusion between the two comes from the result of the <code>typeof</code> operator when used against them. Pre ES6 Undefined is recognised as a type but Null, due to a bug in the ECMAScript implementation, is interpreted as an object.
 
 ```javascript
 var foo;
@@ -949,7 +949,7 @@ foo.bar;  // undefined
 
 ### Summary
 
-Variables defined as type literals, besides object, are known as primitives. They are represented in memory as their primitive values. Variables defined from a type constructor are objects and are stored in memory as objects. They consequently contain all properties from their constructor and therefore have a larger memory footprint than primitives. Since primitives can still temporarily access properties on their type constructor they are nearly always the preferable choice when defining variables over their constructor counterparts.
+Variables defined as type literals, besides object, are known as primitives. They are represented in memory as their primitive values. Variables defined from a type constructor are objects and are stored in memory as objects. They consequently contain all properties from their constructor's prototype and therefore have a larger memory footprint than primitives. Since primitives can still temporarily access properties on their type constructor's prototype they are nearly always the preferable choice when defining variables over their constructor counterparts.
 
 ### Chaining
 

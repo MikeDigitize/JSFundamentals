@@ -3,7 +3,7 @@ A guide to JavaScript.
 
 ## The JavaScript Compiler
 
-JavaScript is a compiled programming language which means any JavaScript code ran in a JavaScript environment, such as a browser or Node, first gets compiled by the engine before it's executed. In this compilation stage the JavaScript is compiled down into machine code with all manner of optimisations carried out on it to help performance. It is at this time, during compilation, when scope is defined.
+JavaScript is a compiled programming language which means any JavaScript code ran in a JavaScript environment, such as a browser or Node, first gets compiled by the engine before it's executed. It is at this time, during compilation, when scope is defined.
 
 ## Lexical scope
 Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source. Pre ES6, variables were scoped either to the global scope or to a function scope. 
@@ -518,7 +518,7 @@ IIFEs work in a similar way, only they close over the current value of the varia
 
 ## Prototypal inheritance
 
-JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that functions and objects should be thought of as two separate constructs; two constructs which essentially form the building blocks of JavaScript. JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. 
+JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that, functions and objects should be thought of as two separate constructs; two constructs which essentially form the building blocks of JavaScript. JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. 
 
 A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. You'd think this is a reference to the constructor function which created the object but alas it isn't quite that simple. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
 
@@ -633,6 +633,7 @@ function AddEvents(){
 
 AddEvents.prototype = new GetEl();
 
+// add event listeners
 AddEvents.prototype.add = function(evt, fn, capture) {
   capture = capture ? capture : false; 
   this.events[evt] = [];
@@ -648,6 +649,7 @@ AddEvents.prototype.add = function(evt, fn, capture) {
   }); 
 };
 
+// remove event listeners
 AddEvents.prototype.remove = function(evt) {
   this.events[evt].forEach(listener => {
     listener.el.removeEventListener(listener.evt, listener.fn, listener.capture);
@@ -720,7 +722,7 @@ Factory functions are great for creating objects that don't need inheritance. Th
 
 ### Composition
 
-Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything when perhaps it doesn't need to. Maybe it only needs one or two methods or properties. With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. Consider the following:
+Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything on its prototype. But what if we only actually need one or two of its properties? With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as - inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. The two can be mixed together though. Consider the following:
 
 ```javascript
 function Total(costs) {
@@ -743,7 +745,7 @@ Bill.prototype.getTip = function() {
 
 var tableOfFour = new Bill();
 tableOfFour.getTotal([20,45,12,54,34,23,33,38,]); // 259
-tableOfFour.getTip(); 51.8
+tableOfFour.getTip(); // 51.8
 
 var tableForTwo = new Bill();
 tableForTwo.getTotal([8,24,12,26]); // 70
@@ -756,6 +758,7 @@ In the above <code>Bill</code> is a constructor that creates instances capable o
 ```javascript
 function IncomeTax(){}
 
+// create a record for each job type and the total earnt from each
 IncomeTax.prototype.jobs = function(jobs) {
   this.jobRecord = jobs.reduce((record, job) => {
     record[job.title] = {};
@@ -764,6 +767,7 @@ IncomeTax.prototype.jobs = function(jobs) {
   }, {});
 };
 
+// calculate the total from all jobs
 IncomeTax.prototype.total = function() {
   this.totalIncome = Object.keys(this.jobRecord)
                       .map(job => this.jobRecord[job].total)
@@ -771,10 +775,10 @@ IncomeTax.prototype.total = function() {
 };
 
 IncomeTax.prototype.taxToPay = function() {
-  this.tax = Percent(22, this.totalIncome); // flat rate of 22% FTW!
+  this.tax = Percent(22, this.totalIncome); // flat rate of 22% tax (if only!)
 };
 
-var work = [{ title : "freelance", amounts : [100, 340, 700] }, { title : "contracts", amounts : [500, 770, 350] }];
+var work = [{ title : "freelance", amounts : [100, 340, 700] },{ title : "contracts", amounts : [500, 770, 350] }];
 var myTax = new IncomeTax();
 myTax.jobs(work);
 myTax.total();  // 2760
@@ -799,11 +803,11 @@ Greet.sayHi("Mike");  // Hello Mike
 
 ```
 
-The module pattern provides encapuslation and control over what is exposed publically. It is by nature a singleton as we will only ever need one instance of it and operate directly on that instance. We also don't have to assign a variable to its return value as we get that for free via the IIFE. As a result of these benefits the revealing module pattern is a very popular pattern.
+The module pattern provides encapuslation and control over what is exposed publically. It is by nature a singleton as there'll only ever be one instance of it and so we always operate directly on that one instance. We also don't have to assign a variable to its return value as it's an expression so we get that for free via the IIFE. Not surprisingly the revealing module pattern is a popular pattern.
 
 ### The Revealing Prototype Pattern
 
-To emphasise the malleability of JavaScript, it's possible to re-engineer the prototype pattern into one that supports private properties. By default the <code>prototype</code> property of a function is an object, but we can change this by incorporating the revealing prototype pattern above.
+To emphasise the malleability of JavaScript, it's possible to re-engineer the prototype pattern into one that supports private properties. By default the <code>prototype</code> property of a function is an object, but we can sidestep this requirement by instead assigning it to an IIFE that returns an object.
 
 ```javascript
 function Greeting(){}

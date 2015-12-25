@@ -518,9 +518,19 @@ IIFEs work in a similar way, only they close over the current value of the varia
 
 ## Prototypal inheritance
 
-JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that, functions and objects should be thought of as two separate constructs; two constructs which essentially form the building blocks of JavaScript. JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. 
+JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that, functions and objects should be thought of as two separate constructs; two constructs which essentially form the building blocks of JavaScript. Whereas with other object constructs such as RegExp or Date, Function is <code>typeof</code> "function" and not "object."
 
-A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. You'd think this is a reference to the constructor function which created the object but alas it isn't quite that simple. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
+```javascript
+var foo = new Date();
+typeof foo; // object
+var bar = new RegExp();
+typeof bar; // object
+var foobar = new Function();
+typeof foobar;  // function
+
+```
+
+JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. You'd think this is a reference to the constructor function which created the object but alas it isn't quite that simple. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
 
 ```javascript
 function A(){}

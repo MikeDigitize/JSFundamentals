@@ -733,7 +733,9 @@ Factory functions are great for creating objects that don't need inheritance. Th
 
 ### Composition
 
-Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything on its prototype. But what if we only actually need one or two of its properties? With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as - inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. The two can be mixed together though. Consider the following:
+Factory functions have an obvious limitation in that they don't support inheritance. But inheritance is not always the best solution for sharing methods. When an instance inherits from a constructor's blueprint it inherits everything on its prototype. But what if we only actually need one or two of its properties? With this in mind an often preferable alternative to pure inheritance is composition - creating objects composed of other objects or functions. Think of the difference between the two as - inheritance is when objects are defined based on what they are whereas composition is objects defined based on what they do. 
+
+The two techniques, like most patterns in JavaScript, can be mixed together. Consider the following:
 
 ```javascript
 function Total(costs) {
@@ -769,7 +771,7 @@ In the above <code>Bill</code> is a constructor that creates instances capable o
 ```javascript
 function IncomeTax(){}
 
-// create a record for each job type and the total earnt from each
+// create a record for each job type and the total earned from each
 IncomeTax.prototype.jobs = function(jobs) {
   this.jobRecord = jobs.reduce((record, job) => {
     record[job.title] = {};

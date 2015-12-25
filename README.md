@@ -687,9 +687,20 @@ pEvts.removeDOM();  // available on an instance of AddEvents through prototypal 
 
 Prototypal inheritance is a very useful pattern but there are a few limitations with it. Firstly, it doesn't allow for private properties - everything must be attached to the instance at instantiation or through the prototype, making all its properties publicly available. Secondly, when extending prototypes there is no mechanism to inherit only the methods or properties that are needed - extending means inheriting everything, which is not always ideal. Thirdly, there is its over reliance on <code>this</code> and the potential for that reference to be overwritten by one of the means discussed earlier in the context chapter, making code within potentially brittle. 
 
+## Static methods
+
+As functions are objects it's possible to store properties on the constructor itself. These are known as <code>static</code> properties. Any instances of the constructor do not inherit these properties as they're not on its <code>prototype</code>.
+
+```javascript
+var foo = { a : "a", b : "b", c : "c" };
+// `keys` is a static property on the Object function
+Object.keys(foo).forEach(key => console.log(key));  // a, b, c
+
+```
+
 ### Summary
 
-Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from functions. Its facilitated through the use of a function - the constructor - and the <code>new</code> keyword. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance. 
+Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from functions. Its facilitated through the use of a function - the constructor - and the <code>new</code> keyword. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance. Any properties added to the constructor directly are known as static properties and are available only via the constructor and not on any instances of it.
 
 ## JavaScript Design Patterns
 
@@ -829,6 +840,64 @@ Greeting can still be extended through its prototype, however with this pattern 
 ### Summary
 
 There are a plethora of possible ways to create objects in JavaScript, each with certain characteristics or idiosyncracies that give them specific advantages or disadvantages in relation to other patterns.
+
+## Data Types
+
+As of ES6 there are seven different data types in JavaScript - 
+
+* String
+* Number
+* Boolean
+* Undefined
+* Symbol
+* Object
+
+All types, except objects, are known as primitives. And all primitives are immutable values (values which are incapable of being changed). When creating a primitive as a type literal - i.e. without the use of its constructor - the primitive simply represents a value of that type in memory, therefore leaving a very small memory footprint. Consider the following:
+
+```javascript
+// primitive string
+var foo = "foo";
+typeof foo === "string";  // true
+// primitive number
+var bar = 1;
+typeof bar === "number";  // true
+// primitive boolean
+var foobar = true;
+typeof foobar === "boolean";  // true
+
+//primitive values
+foo;  // "foo"
+bar;  // 1
+foobar; // true
+
+// object string
+var foo = new String("foo");
+typeof foo === "object";  // true
+// object number
+var bar = new Number(1);
+typeof bar === "object";  // true
+// object boolean
+var foobar = new Boolean(true);
+typeof foobar === "object";  // true
+
+// object value
+foo;  // String { 0: "s", 1: "t", 2: "r", length: 3, [[PrimitiveValue]]: "str" }
+bar;  // Number { [[PrimitiveValue]]: 1 }
+foobar; // Boolean { [[PrimitiveValue]]: true }
+
+```
+
+The above demonstrates the difference in resulting value when declaring a variable with a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive, however what if you had, for example, a primitive string and you needed access to its length property on the String prototype? It wouldn't be unreasonable to assume you would need to have created the string via a constructor to get access to this property as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
+
+When attempting to use a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access to static and prototypal properties. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
+
+```javascript
+var foo = "foo";
+foo.length; // 2
+typeof foo; // "string"
+
+```
+
 
 ### Chaining
 

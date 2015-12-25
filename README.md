@@ -687,7 +687,7 @@ pEvts.removeDOM();  // available on an instance of AddEvents through prototypal 
 
 Prototypal inheritance is a very useful pattern but there are a few limitations with it. Firstly, it doesn't allow for private properties - everything must be attached to the instance at instantiation or through the prototype, making all its properties publicly available. Secondly, when extending prototypes there is no mechanism to inherit only the methods or properties that are needed - extending means inheriting everything, which is not always ideal. Thirdly, there is its over reliance on <code>this</code> and the potential for that reference to be overwritten by one of the means discussed earlier in the context chapter, making code within potentially brittle. 
 
-## Static methods
+### Static methods
 
 As functions are objects it's possible to store properties on the constructor itself. These are known as <code>static</code> properties. Any instances of the constructor do not inherit these properties as they're not on its <code>prototype</code>.
 

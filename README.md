@@ -934,12 +934,12 @@ When attempting to access a prototype property on a literal, JavaScript coerces 
 // primitive
 var foo = "foo";
 // temporary access to an object property 
-foo.length; // 2
+foo.length; // 3
 // restored to primitive
 typeof foo; // "string"
-// set property on primitive - temporary access to an object property
+// set property
 foo.bar = "bar";
-// restored to primitive
+// primitives are immutable
 foo.bar;  // undefined
 
 ```

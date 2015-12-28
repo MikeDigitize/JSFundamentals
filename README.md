@@ -31,9 +31,7 @@ function foo() {
   var bar = "bar";
 }
 
-// error 
-// bar is not available outside of the function scope
-console.log(bar);
+console.log(bar); // error - bar is not available outside of the function scope
 
 ```
 
@@ -57,9 +55,7 @@ for (let i = 0; i < 5; i++) {
   // i available within
 }
 
-// error
-// i is scoped to the for loop block and not available externally
-console.log(i);
+console.log(i); // error - i is scoped to the for loop block and not available externally
 
 // block scoping could be achieved pre ES6 through IIFEs (see chapter on IIFEs)
 var x = 10;
@@ -147,8 +143,7 @@ function foo() {
 function foo() {
   var x;
   console.log(x); // undefined
-  // error y is not definied
-  console.log(y);
+  console.log(y); // error - y is not yet defined
   x = 1;
   let y = 2;
 }
@@ -162,7 +157,7 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Dynamic Scope
 
-Dynamic scope is the runtime counterpart to lexical scope. It can be thought of as either scope which could not be determined at the compiler stage or scope that's generated whenever a function is called. Upon a function call, scope is available to access through the function's variable <code>environment</code>, or prior to ES5, its <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
+Dynamic scope is the runtime counterpart to lexical scope. It can be thought of as either scope which could not be determined at the compiler stage or scope that's generated whenever a function is called. Upon a function call, scope is available to access through the function's variable <code>environment</code>, or prior to ES5, what was known as its <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
 
 This <code>[[scope]]</code> property gives the function access to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine checks against a function's immediate scope. If the variable isn't found it checks against its parent, and then its parent's parent until finally it reaches the global scope where, if it's not found, the engine throws a reference error.
 
@@ -183,13 +178,46 @@ bar();  // foobar
 
 The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - its <code>environment</code>, which holds anything in its lexical scope. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
 
+It is not always possible to determine scope at compilation time. Consider the following:
+
+```javascript
+function foo() {
+    return {
+        name : "foo",
+        fn : function() {
+            return this.name;
+        }
+    }
+}
+
+function bar() {
+    return {
+        name : "bar",
+        fn : function() {
+            return this.name;
+        }
+    }
+}
+
+function getRandom(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function getName() {
+    var random = Math.floor(getRandom(0, 2));
+    var options = [foo(), bar()];
+    return options[random].fn();  // randomly pick either `foo` or `bar` to execute
+}
+
+getName();  // ???
+
+```
+
+The above shows how there is no way to predict the exact output of the function <code>getName</code> at compile time as its return value is randomly chosen from two possible outcomes at runtime. Only after the random choice has been made can scope for <code>getName</code> be confirmed in order to look up the <code>fn</code> method and from there lookup the <code>name</code> property that the method returns. The use of context and <code>this</code> in JavaScript is explained in the next chapter.
+
 ### Summary
 
-At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical and dynamic scope. When asked to lookup a variable referenced within the function, the engine first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and is known as dynamic scoping.
-
-### The Call Stack
-
-The stack is generated at runtime, after the compilation stage. 
+At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical and dynamic scope. When asked to lookup a variable referenced within the function, the engine first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and therefore is categorised as dynamic scoping. The same term is also used to describe scope that cannot be determined at compilation time.
 
 ## Context
 
@@ -276,6 +304,7 @@ var addTwo = {
 var num = 5;
 console.log(addTwo.calc(2));  // 2
 console.log(addTwo.calc.call(this, 5)); // 10
+
 ```
 
 The difference between call and apply is in the subsequent argument(s) they accept. The first argument becomes the context of <code>this</code>, any other arguments are passed into the function as parameters. <code>call</code> takes an indefinite amount of comma separated parameters, whilst <code>apply</code> takes a single array of values as its second parameter. This is demonstrated in the following example:
@@ -410,6 +439,10 @@ What actually happens behind the scenes is not the same as using bind however. I
 ### Summary
 Context or <code>this</code> in JavaScript is a reference to a function's execution context. It is dynamic in nature and set at runtime, not during compilation. Context is defined organically either as the call site of the function or by using a constructor function, or set explicitly through the use of call, apply, bind and fat arrow functions.
 
+## The Call Stack
+
+The stack is generated at runtime, after the compilation stage. 
+
 ## Closures
 Understanding closures is something that can only really be done when aware of how lexical and dynamic scoping in JavaScript work. Take the following example:
 
@@ -492,6 +525,7 @@ In the above IIFE, the variable <code>a</code> is passed in as an argument and a
 <button class="btn">Click me!</button>
 <button class="btn">Click me!</button>
 <button class="btn">Click me!</button>
+
 ```
 
 ```javascript
@@ -631,7 +665,6 @@ hi.greeting;  // hi
 Constructors created to provide a simple piece of functionality can be extended to create more complex pieces of functionality. Consider the following example of a constructor that gets and sets a DOM element:
 
 ```html
-<!-- DOM -->
 <p>This</p>
 <p>is</p>
 <p>Text</p>

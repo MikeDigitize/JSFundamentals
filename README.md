@@ -182,19 +182,19 @@ It is not always possible to determine scope at compilation time. Consider the f
 
 ```javascript
 function foo() {
+    var name = "foo";
     return {
-        name : "foo",
         fn : function() {
-            return this.name;
+            return name;
         }
     }
 }
 
 function bar() {
+    var name = "bar";
     return {
-        name : "bar",
         fn : function() {
-            return this.name;
+            return name;
         }
     }
 }
@@ -213,7 +213,7 @@ getName();  // ???
 
 ```
 
-The above shows how there is no way to predict the exact output of the function <code>getName</code> at compile time as its return value is randomly chosen from two possible outcomes at runtime. Only after the random choice has been made can scope for <code>getName</code> be confirmed in order to look up the <code>fn</code> method and from there lookup the <code>name</code> property that the method returns. The use of context and <code>this</code> in JavaScript is explained in the next chapter.
+The above shows how there is no way to predict the exact output of the function <code>getName</code> at compile time as its return value is randomly chosen from two possible outcomes. Only after the random choice has been made at runtime can scope for <code>getName</code> be confirmed, enabling correct lookup of the <code>fn</code> method and from there the value of <code>name</code> in its lexical scope.
 
 ### Summary
 

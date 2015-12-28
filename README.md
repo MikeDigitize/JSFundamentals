@@ -6,7 +6,9 @@ A guide to JavaScript.
 JavaScript is a compiled programming language which means any JavaScript code ran in a JavaScript environment, such as a browser or Node, first gets compiled by the engine before it's executed. It is at this time, during compilation, when scope is defined.
 
 ## Lexical scope
-Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source. Pre ES6, variables were scoped either to the global scope or to a function scope. 
+Scope can be thought of as the thing that dictates the availability of variables and functions in a JavaScript environment. It's a concept that relies on a number of mechanisms, the behaviour of whom collectively define the fundamental way in which JavaScript works. We'll cover these mechanism over the next several chapters. 
+
+When a variable or function is declared in JavaScript it is scoped to its location within the code at author time. This is known as lexical scoping - lexical refers to lexicon i.e. the source (code). Pre ES6, variables were scoped either to the global scope or to a function scope. 
 
 ```javascript
 // global scope
@@ -20,7 +22,9 @@ function bar() {
 
 ### Variable and function scope
 
-If a variable is defined in the global scope, it is available globally, throughout any code executed in the global environment. If a variable is defined in a function it is scoped to that function and therefore is available only within that function, not outside of it.
+If a variable is defined in the global scope, it is available globally, throughout any code executed in the global environment. If a variable is defined in a function it is scoped locally to that function and therefore is available only within that function, not outside of it. This is known as <code>nested</code> scope. 
+
+Scope not only defines a variable's availability, it can go some way to determine its lifetime too. If a variable is defined globally, its lifetime will likely be longer than, for example, a variable that's defined within a function that's called only once and doesn't leave its parent scope.
 
 ```javascript
 function foo() {
@@ -30,9 +34,10 @@ function foo() {
 // error 
 // bar is not available outside of the function scope
 console.log(bar);
+
 ```
 
-In JavaScript you describe your data and your data handlers either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two, other than the way they're declared (see below), is in the way the compiler treats them.
+Your data and data operators are described either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them (explained later).
 
 ```javascript
 // declaration
@@ -55,13 +60,27 @@ for (let i = 0; i < 5; i++) {
 // error
 // i is scoped to the for loop block and not available externally
 console.log(i);
+
+// block scoping could be achieved pre ES6 through IIFEs (see chapter on IIFEs)
+var x = 10;
+ 
+if (true) {
+  (function() {
+    var x = 20;
+    // locally scoped to if block
+    console.log(x); // 20
+  })();
+}
+ 
+console.log(x); // 10
+
 ```
 
 ### Summary
-Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compilation stage, before the code is executed. Scope determined at compile time is known as lexical scoping.
+Scope dictates the availablity of variables within your code. Variables can be scoped globally, within a function or within a block. Variable scope is determined in the compilation stage, before the code is executed. Scope determined at compile time is known as lexical scoping as it's determined based on the location of functions and variables within the source at author time.
 
 ## Hoisting
-The compiler hoists variables and functions in your code to the top of the scope they are declared in. Take the following code:
+The compiler hoists variables and functions to the top of the scope they are declared in. Take the following code:
 
 ```javascript
 // pre compiler
@@ -73,7 +92,7 @@ function b() {
 
 ```
 
-The compiler runs through the code and hoists the variables and functions to the top of the parent scope (in the above example the global scope), so when the code is executed at run time it looks like this:
+The compiler runs through the code and hoists the variables and functions to the top of their parent scope (in the above example the global scope), so when the code is executed at run time it looks like this:
 
 ```javascript
 
@@ -84,9 +103,10 @@ function b() {
 var a;
 a = b();
 console.log(a); // foo
+
 ```
 
-Function declarations and expressions are treated differently by the compiler. Notice in the above example how the function declaration is hoisted to the top of the scope in its entirety. A function expression would be treated differently. Here's the same example again but using a function expression.
+Declarations and expressions are treated differently by the compiler, as mentioned earlier. Notice in the above example how the function declaration is hoisted to the top of the scope in its entirety. A function expression would be treated differently. Here's the same example again but using a function expression.
 
 ```javascript
 // pre compiler
@@ -100,9 +120,7 @@ var b = function() {
 var a;
 var b;
 
-// error
-// b is not a function and is at this time undefined
-a = b();
+a = b();  // error - b is not a function and is at this time still undefined
 b = function() {
   return "foo";
 }
@@ -112,7 +130,7 @@ console.log(a);
 
 At runtime the above example would attempt to call <code>b</code> as a function before the function body is assigned as its value, resulting in an error. At that time its value is still undefined and therefore cannot be called as a function. 
 
-### Hoisting and let and const
+### Hoisting let and const
 
 Let and const are not hoisted like var and function. Take the following example:
 
@@ -144,9 +162,9 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Dynamic Scope
 
-Dynamic scope is the runtime counterpart to lexical scope. Dynamic scope in JavaScript is scope created whenever a function is called, and is referred to as its variable <code>environment</code>, or prior to ES5, <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
+Dynamic scope is the runtime counterpart to lexical scope. It can be thought of as either scope which could not be determined at the compiler stage or scope that's generated whenever a function is called. Upon a function call, scope is available to access through the function's variable <code>environment</code>, or prior to ES5, its <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
 
-This property gives the function a reference to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine will check against a function's immediate scope. If not found it looks to its parent, and then its parent's parent until it reaches the global scope where, if it's not found, the engine will throw a reference error.
+This <code>[[scope]]</code> property gives the function access to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine checks against a function's immediate scope. If the variable isn't found it checks against its parent, and then its parent's parent until finally it reaches the global scope where, if it's not found, the engine throws a reference error.
 
 Consider the following:
 
@@ -167,7 +185,11 @@ The variable <code>foobar</code> is defined in the scope of <code>bar</code> and
 
 ### Summary
 
-At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical scope. When asked to lookup a variable referenced within the function, the engine first checks against its immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and is known as dynamic scoping.
+At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical and dynamic scope. When asked to lookup a variable referenced within the function, the engine first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and is known as dynamic scoping.
+
+### The Call Stack
+
+The stack is generated at runtime, after the compilation stage. 
 
 ## Context
 

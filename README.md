@@ -840,7 +840,20 @@ Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ### Object.Create
 
-The use of constructors and the <code>new</code> keyword is often controversial in JavaScript. Some developers prefer their readability and easy to grasp semantics, whilst others say they indicate a similarity to Java, a class based not prototypal language, which encourages developers to write in a way that does not play to JavaScript's strengths.
+The use of constructors and the <code>new</code> keyword is often controversial in JavaScript. Some developers prefer the readability and easy to grasp semantics, whilst others say they falsely suggest a similarity to Java's class based constructor pattern, see below, encouraging developers to write JavaScript through a paradigm that restrict JavaScript's strengths.
+
+```java
+// constructor
+public Foo(int startBar) {
+    bar = startBar;
+}
+
+// instance
+Foo myFoo = new Foo(30);
+
+```
+
+ES5 saw the ntroduction of <code>Object.create</code> which was designed as a counter to <code>new constructor</code>.
 
 ### Summary
 
@@ -1117,7 +1130,7 @@ foo === bar;  // true
 
 ```
 
-It would not be unreasonable after seeing the above to think that <code>bar</code> is the same object as <code>foo</code> as, firstly we assigned <code>bar</code> to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
+It wouldn't be unreasonable after seeing the above to think that <code>bar</code> is a reference to <code>foo</code> as, firstly we assigned <code>bar</code> to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
 
 ```javascript
 // re-assign `foo` to a new object
@@ -1130,7 +1143,27 @@ foo === bar;  // false
 
 ```
 
-Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's often a concept not fully appreciated and is worth highlighting.
+Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's a concept often not fully appreciated and is worth highlighting.
+
+### Mutation
+
+Mutation is similar to but not the same as rebinding. Rebinding affects the identifiers whilst mutation affects the values. Consider the following:
+
+```javascript
+var foo = { name : "bar" };
+// mutation
+foo.name = "foo";
+// rebinding
+foo = { name : "foo" };
+
+// rebinding
+foo = [1, 2, 3];
+// mutation
+foo.push(4);
+// mutation
+foo[0] = 0;
+
+```
 
 
 ### Summary

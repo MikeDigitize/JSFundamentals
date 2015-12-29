@@ -157,7 +157,7 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## Dynamic Scope
 
-Dynamic scope is the runtime counterpart to lexical scope. It can be thought of as either scope which could not be determined at the compiler stage or scope that's generated whenever a function is called. Upon a function call, scope is available to access through the function's variable <code>environment</code>, or prior to ES5, what was known as its <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
+Dynamic scope is the runtime counterpart to lexical scope. It can be thought of as scope that's generated whenever a function is called. Upon a function call, scope is available to access through the function's variable <code>environment</code>, or prior to ES5, what was known as its <code>activation object</code>. The <code>environment</code> creates a reference in memory to all the variables defined in that function scope including its arguments, and has access to its lexical scope through an inaccessible property <code>[[scope]]</code>. 
 
 This <code>[[scope]]</code> property gives the function access to its parent scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript engine checks against a function's immediate scope. If the variable isn't found it checks against its parent, and then its parent's parent until finally it reaches the global scope where, if it's not found, the engine throws a reference error.
 
@@ -178,46 +178,9 @@ bar();  // foobar
 
 The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - its <code>environment</code>, which holds anything in its lexical scope. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
 
-It is not always possible to determine scope at compilation time. Consider the following:
-
-```javascript
-function foo() {
-    var name = "foo";
-    return {
-        fn : function() {
-            return name;
-        }
-    }
-}
-
-function bar() {
-    var name = "bar";
-    return {
-        fn : function() {
-            return name;
-        }
-    }
-}
-
-function getRandom(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
-function getName() {
-    var random = Math.floor(getRandom(0, 2));
-    var options = [foo(), bar()];
-    return options[random].fn();  // randomly pick either `foo` or `bar` to execute
-}
-
-getName();  // ???
-
-```
-
-The above shows how there is no way to predict the exact output of the function <code>getName</code> at compile time as its return value is randomly chosen from two possible outcomes. Only after the random choice has been made at runtime can scope for <code>getName</code> be confirmed, enabling correct lookup of the <code>fn</code> method and from there the value of <code>name</code> in its lexical scope.
-
 ### Summary
 
-At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical and dynamic scope. When asked to lookup a variable referenced within the function, the engine first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and therefore is categorised as dynamic scoping. The same term is also used to describe scope that cannot be determined at compilation time.
+At runtime, when a function is called, the JavaScript engine creates an object representing that function's variable <code>environment</code> which holds references to everything in its lexical and dynamic scope. When asked to lookup a variable referenced within the function, the engine first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. A function's <code>environment</code> is created at runtime as the code executes and therefore is categorised as dynamic scoping.
 
 ## Context
 
@@ -229,10 +192,10 @@ Consider the following example:
 
 ```javascript
 function bar() {
-  console.log(this.a);  // "bar"
+  console.log(this.a);  
 }
 var a = "bar";
-bar();
+bar();  // bar
 
 ```
 
@@ -242,14 +205,15 @@ This is known as the default context rule. Be aware that in strict mode the defa
 
 ```javascript
 function bar() {
-  console.log(this.a);  // "foo"
+  console.log(this.a);
 }
 var a = "bar";
 var foo = {
   a : "foo",
   b : bar
 };
-foo.b();
+foo.b();  // foo
+
 ```
 
 Now the bar function is called not in the global scope but in the scope of <code>foo</code> which also has a property named <code>a</code>. When bar is called <code>this</code> is assigned to the call site, which is <code>foo</code>, and therefore <code>a</code> is looked up against <code>foo</code> and not the global object as it was previously.
@@ -441,7 +405,7 @@ Context or <code>this</code> in JavaScript is a reference to a function's execut
 
 ## The Call Stack
 
-The stack is generated at runtime, after the compilation stage. 
+The stack is generated at runtime.
 
 ## Closures
 Understanding closures is something that can only really be done when aware of how lexical and dynamic scoping in JavaScript work. Take the following example:
@@ -532,7 +496,7 @@ In the above IIFE, the variable <code>a</code> is passed in as an argument and a
 var btns = document.querySelector(".btn");
 for(var i = 0; i < btns.length; i++) {
   btns[i].addEventListener("click", () => { 
-    console.log(`I am button ${i}`);  // es6 template strings will be covered later
+    console.log(`I am button ${i}`);  // es6 template strings for string concat
   }, false);
 }
 
@@ -960,7 +924,7 @@ var foobar = true;
 typeof foobar === "boolean";  // true
 
 //primitive values
-foo;  // "foo"
+foo;  // foo
 bar;  // 1
 foobar; // true
 
@@ -991,7 +955,7 @@ var foo = "foo";
 // temporary access to an object property 
 foo.length; // 3
 // restored to primitive
-typeof foo; // "string"
+typeof foo; // string
 // set property
 foo.bar = "bar";
 // primitives are immutable
@@ -1039,9 +1003,49 @@ foo.bar;  // undefined
 
 ```
 
+### Variable binding and unbinding
+
+JavaScript is a weakly typed, dynamic language which means that firstly variables do not have to be declared with a specific type and secondly that variables can be rebound from one value (regardless of type) to another.
+
+```javascript
+var obj = {};
+typeof obj === "object"; // true
+obj = function(){};
+typeof obj === "function"; // true
+
+```
+
+In JavaScript functions and variables are given names to associate them with the objects or values they represent. The names given are often referred to as identifiers or references. It is important to remember whenever dealing with idenitifiers that they point only at values and not at each other. Consider the following example:
+
+```javascript
+var foo = { name : "bar" };
+var bar = foo;
+
+bar.name; // bar
+foo === bar;  // true
+
+```
+
+It would not be unreasonable after seeing the above to think that <code>bar</code> is the same object as <code>foo</code> as, firstly we assigned <code>bar</code> to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
+
+```javascript
+// re-assign `foo` to a new object
+foo = { name : "foo" };
+
+// `bar` still points to the old object
+bar.name; // bar
+// therefore their values are no longer the same
+foo === bar;  // false
+
+```
+
+Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's often a concept not fully appreciated and is worth highlighting.
+
+
 ### Summary
 
-Variables defined as type literals, besides object, are known as primitives. They are represented in memory as their primitive values. Variables defined from a type constructor are objects and are stored in memory as objects. They consequently contain all properties from their constructor's prototype and therefore have a larger memory footprint than primitives. Since primitives can still temporarily access properties on their type constructor's prototype they are nearly always the preferable choice when defining variables over their constructor counterparts.
+Variables defined as type literals, besides object, are known as primitives. They are represented in memory as their primitive values. Variables defined from a type constructor are objects and are stored in memory as objects. They consequently contain all properties from their constructor's prototype and therefore have a larger memory footprint than primitives. Since primitives can still temporarily access properties on their type constructor's prototype they are nearly always the preferable choice when defining variables over their constructor counterparts. When pointing a variable at another, the identifier points to its value, not to the reference itself.
+
 
 ### Chaining
 

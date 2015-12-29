@@ -588,7 +588,9 @@ foo.bar; // foobar
 
 ```
 
-In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating an implicit link between constructor and instance, behind the scenes. The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance has an implicit link to the prototype of its constructor. Properties defined on the constructor's prototype do not appear on the instance, but can be referenced as if they were.
+In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating an implicit link between constructor and instance, behind the scenes. This implicit link on an instance is, confusingly, also known as the <code>[[Prototype]]</code> and will be detailed shortly. 
+
+The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance gets linked to the prototype of its constructor via its <code>[[Prototype]]</code>. Properties defined on the constructor's prototype do not appear on the instance, but can be referenced as if they were through the prototype chain, facilitated by <code>[[Prototype]]</code>.
 
 ```javascript
 function A(){}
@@ -653,7 +655,7 @@ p.getDOM(); // array of p tags
 
 ```
 
-This is common behaviour so it makes sense for it to be wrapped in a re-usable function. It's important to recognise the reduction in memory consumption that prototypal inheritance offers. Any new instances of the above will be able to retrieve DOM elements but the function that sets the DOM element is only defined once, on the constructor's prototype. Every instance does not carry its own version of that function, they all just point to the one on the prototype therefore saving memory. Something else that is common behaviour, besides retrieving DOM elements, is adding and removing event listeners to DOM elements. So wouldn't it be useful if we could extend the above to accomodate event handling? Consider the following: 
+This is common behaviour so it makes sense for it to be wrapped in a re-usable function. It's important to recognise the reduction in memory consumption that prototypal inheritance offers. Any new instances of the above will be able to retrieve DOM elements but the function that sets the DOM element is only defined once, on the constructor's prototype. Every instance does not carry its own version of that function, they all just point to the one on the prototype, therefore reducing their memory footprint. Something else that is common behaviour, besides retrieving DOM elements, is adding and removing event listeners to DOM elements. So wouldn't it be useful if we could extend the above to accomodate event handling? Consider the following: 
 
 ```javascript
 function AddEvents(){
@@ -714,11 +716,11 @@ pEvts.removeDOM();  // available on an instance of AddEvents through prototypal 
 
 ```
 
-Prototypal inheritance is a very useful pattern but there are a few limitations with it. Firstly, it doesn't allow for private properties - everything must be attached to the instance at instantiation or through the prototype, making all its properties publicly available. Secondly, when extending prototypes there is no mechanism to inherit only the methods or properties that are needed - extending means inheriting everything, which is not always ideal. Thirdly, there is its over reliance on <code>this</code> and the potential for that reference to be overwritten by one of the means discussed earlier in the context chapter, making code within potentially brittle. 
+Prototypal inheritance is a clearly useful pattern but there are a few limitations with it. Firstly, it doesn't allow for private properties - everything must be attached to the instance at instantiation or through the prototype, making all its properties publicly available. Secondly, when extending prototypes there is no mechanism to inherit only the methods or properties that are needed - extending means inheriting everything, which is not always ideal. Thirdly, there is its over reliance on <code>this</code> and the potential for that reference to be overwritten by one of the means discussed earlier in the context chapter, making code within potentially brittle. 
 
 ### [[Prototype]]
 
-Things can become a little confusing regarding JavaScript's inheritance model when you discover that it is not the explicit property <code>prototype</code> property found on functions that facilitates prototypal inheritance. Whilst objects that are instances of constructors inherit from their <code>prototype</code> property, all objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, as prototype, but written in the ECMAScript spec as [[Prototype]]. You'll see this internal prototype property written in script as <code>__proto__</code> or referred to as the "dunder" prototype. The way to differentiate between the two is to think of the <code>prototype</code> property as used to create new objects, whilst the dunder proto is used to lookup properties in the prototype chain.
+Things can become a little confusing regarding JavaScript's inheritance model when you discover that it is not the explicit property <code>prototype</code> property found on functions that facilitates prototypal inheritance. Whilst objects that are instances of constructors inherit from their <code>prototype</code> property, all objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. You'll see this internal prototype property written in script as <code>\__proto__</code> or referred to as the "dunder" prototype. The way to differentiate between the two is to think of the <code>prototype</code> property as used to create new objects, whilst the dunder proto is used to lookup properties in the prototype chain.
 
 ```javascript
 var Foo = function(){}
@@ -728,7 +730,7 @@ foo.__proto__ === foo.constructor.prototype;  // true
 
 ```
 
-The <code>__proto__</code> property has been standardised as of ES6 which now gives us another means to create objects, only this time not from constructors but from other objects.
+The <code>\__proto__</code> property has been standardised as of ES6 which now gives us another means to create objects, only this time not from constructors but from other objects.
 
 ```javascript
 var foo = { name : "foo" };
@@ -738,9 +740,10 @@ bar.name; //  foo
 
 ```
 
-To demonstrate how <code>__proto__</code> is used to lookup inherited properties consider the following:
+To demonstrate how <code>\__proto__</code> is used to lookup inherited properties consider the following:
 
 ```javascript
+// the prototype chain using objects
 var foo = { bar : "foo" };
 var bar = {};
 bar.__proto__ = foo;
@@ -755,6 +758,7 @@ foobar.__proto__.foo; // bar
 foobar.__proto__.__proto__ === foo; // true
 foobar.__proto__.__proto__.bar;  // foo
 
+// the prototype chain using constructors
 function Bar(){}
 Bar.prototype.foo = "foo";
 function Foo(){}
@@ -773,7 +777,7 @@ bar.__proto__.__proto__.foo; // foo
 
 ```
 
-JavaScript resolves object properties in the same way scope resolves references within functions and the global scope, only instead of using the variable environment / activation object, it uses the <code>[[Prototype]]</code> chain through the dunder proto property. The above examples essentially achieve the same thing. In both, when looking up properties, the JavaScript engine first looks to see if the property resides on the instance. If the engine doesn't find it there, it begins to traverse up the <code>[[Prototype]]</code> chain checking against each <code>__proto__</code> object until it reaches Object's dunder prototype, which is where the chain ends and resolves as <code>null</code>. If the engine can't find the property on Object - the dunder proto equivalent of scope's global environment - <code>undefined</code> is returned.
+JavaScript resolves object properties in the same way scope resolves references within functions and the global scope, only instead of using the variable environment / activation object, it uses the <code>[[Prototype]]</code> chain through the dunder proto property. The above examples essentially achieve the same thing. In both, when looking up properties, the JavaScript engine first looks to see if the property resides on the instance. If the engine doesn't find it there, it begins to traverse up the <code>[[Prototype]]</code> chain checking against each <code>\__proto__</code> object until it reaches Object's dunder prototype, which is where the chain ends and resolves as <code>null</code>. If the engine can't find the property on Object - the dunder proto equivalent of scope's global environment - <code>undefined</code> is returned.
 
 ### Constructor property gotchas
 
@@ -834,9 +838,14 @@ Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ```
 
+### Object.Create
+
+The use of constructors and the <code>new</code> keyword is often controversial in JavaScript. Some developers prefer their readability and easy to grasp semantics, whilst others say they indicate a similarity to Java, a class based not prototypal language, which encourages developers to write in a way that does not play to JavaScript's strengths.
+
 ### Summary
 
-Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from other objects or functions. Its facilitated either through the use of a function - the constructor - and the <code>new</code> keyword or an object and it's [[Prototype]] property, known as the dunder proto property and written as <code>__proto__</code>. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance. Any properties added to the constructor directly are known as static properties and are available only via the constructor and not on any instances of it. The dunder prototype is a newly standardised property (previously implementations differed from engine to engine) which points to the prototype of an object's constructor, traversal of which is the underlying way in which JavaScript looks up properties on an object's the prototype chain.
+Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from other objects or functions. Its facilitated either through the use of a function - the constructor - and the <code>new</code> keyword or an object and it's [[Prototype]] property, known as the dunder proto property and written as <code>\__proto__</code>. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance. Any properties added to the constructor directly are known as static properties and are available only via the constructor and not on any instances of it. The dunder prototype is a newly standardised property (previously implementations differed from engine to engine) which points to the prototype of an object's constructor, traversal of which is the underlying way in which JavaScript looks up properties against an object's prototype chain.
+
 
 ## JavaScript Design Patterns
 

@@ -157,9 +157,9 @@ Variables declared with var or function are hoisted to the top of their parent s
 
 ## The Execution Context
 
-The execution context is dynamically generated as a kind of runtime counterpart to lexical scope. It can be thought of as an object that's generated whenever a function is called. Upon a function call, the JavaScript interpreter creates an object containing references to everything in its lexical scope. This is known as the function's <code>variable environment</code> or, prior to ES5, its <code>activation object</code>. The <code>environment</code> contains all references in that function's immediate scope including its arguments - also known as the function's <code>execution context</code> - and has access to its non-immediate lexical scope (through it's parent's <code>variable environment</code>).
+The execution context is dynamically generated at runtime. It can be thought of as an object which is generated whenever a function is called. Upon a function call, the JavaScript interpreter creates the object and attaches to it references to everything in its lexical scope. This is known as the function's <code>variable environment</code> or, prior to ES5, its <code>activation object</code>. The <code>environment</code> contains all references in that function's immediate scope including its arguments and has access to its non-immediate lexical scope through a reference to it's parent's <code>variable environment</code>.
 
-This means any function, when called, has access to its parent's scope (<code>variable  environment</code>), and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript interpreter checks against a function's immediate scope. If the variable isn't found it checks against its parent, and then its parent's parent until finally it reaches the global scope where, if it's not found, throws a reference error.
+This means any function, when called, has access to its parent's scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript interpreter checks against a function's immediate scope. If the variable isn't found it checks against its parent, and then its parent's parent until finally it reaches the global scope where, if it's not found, throws a reference error.
 
 Consider the following:
 
@@ -176,15 +176,15 @@ bar();  // foobar
 
 ```
 
-The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new object is created - its <code>environment</code> or , which holds anything in its lexical scope. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, it looks up the value of <code>foobar</code> against its <code>variable environment</code>. It's not in its immediate scope so it looks for it in its parent scope where it finds it and is able to return it.
+The variable <code>foobar</code> is defined in the scope of <code>bar</code> and so is lexically scoped to <code>bar</code> and any of its descendant functions. When <code>bar</code> is called, a new execution context is created which contains its <code>variable environment</code> and provides access to anything in its lexical scope. The same thing happens for the inner function <code>foo</code>. When <code>foo</code> is called as the return value of <code>bar</code>, the interpreter looks up the value of <code>foobar</code> against its <code>variable environment</code>. In this case <code>foobar</code> is not in its immediate scope so the interpreter goes up a level and looks for it in its parent's scope, where it finds it and is able to return the value.
 
 ### Summary
 
-At runtime, when a function is called, the JavaScript engine creates an object representing that function's <code>variable environment</code> or <code>execution context</code>, which holds references to everything in its immediate scope and a link to its parent's <code>variable environment</code>. When asked to lookup a variable referenced within the function, the engine first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope using each scope's <code>variable environment</code>.
+At runtime, when a function is called, the JavaScript engine creates an excution context for that function. This can be thought of as an object representing that function's <code>variable environment</code> and holds references to everything in its immediate scope and a link to its parent's <code>variable environment</code>. When asked to lookup a variable referenced within the function, the interpreter first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. Only after it cannot find it in he global scope will the interpreter throw a reference error.
 
 ## Context
 
-Context in JavaScript is defined at runtime as part of a function's dynamically generated variable environment or execution context. JavaScript stores the reference to a function's context as the keyword <code>this</code>. Context can be defined organically or artificially in JavaScript. 
+Context in JavaScript is defined at runtime as part of a function's dynamically generated execution context. JavaScript provides a reference to a function's context through the keyword <code>this</code>. Context can be defined organically or artificially in JavaScript. 
 
 ### The default context rule
 
@@ -234,7 +234,7 @@ foo.sayName();  // mike
 
 ```
 
-The object returned from the constructor has a method <code>sayName</code> which returns a reference to <code>this</code>. Even though the call to the function is made in the global scope, its call site (and therefore context) is the object <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, refers to the instance of the constructor. It can therefore be used to set values specific to that instance. Prototypal inheritance will be covered in a later chapter.
+The object returned from the constructor has a method <code>sayName</code> which contains a reference to <code>this</code>. Through the use of the constructor <code>this</code> is bound to the instance, in this case the variable <code>foo</code>. In the above we can see that <code>this</code>, when used in a constructor or any property on a constructor's prototype, will be bound to that instance of the constructor. It can therefore be used to set values specific to that instance. Prototypal inheritance will be covered in a later chapter.
 
 The default rule and the constructor are the two organic ways in which context is defined in JavaScript. It can be explicitly set through other means however. The definition of <code>this</code> when explicilty set supersedes the organic ways. Context can be explicitly set in four different ways, as of ES6.
 

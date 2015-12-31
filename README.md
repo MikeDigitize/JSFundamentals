@@ -615,7 +615,7 @@ typeof foobar;  // function
 
 ```
 
-JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. You'd think this is a reference to the constructor function which created the object but alas it isn't quite that simple. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
+JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
 
 ```javascript
 function A(){}
@@ -785,7 +785,7 @@ Prototypal inheritance is a clearly useful pattern but there are a few limitatio
 
 ### [[Prototype]]
 
-Things can become a little confusing regarding JavaScript's inheritance model when you discover that it is not the explicit property <code>prototype</code> property found on functions that facilitates prototypal inheritance. Whilst objects that are instances of constructors inherit from their <code>prototype</code> property, all objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. You'll see this internal prototype property written in script as <code>\__proto__</code> or referred to as the "dunder" prototype. The way to differentiate between the two is to think of the <code>prototype</code> property as used to create new objects, whilst the dunder proto is used to lookup properties in the prototype chain.
+Things can become a little confusing regarding JavaScript's inheritance model when you discover that it is not the explicit property <code>prototype</code> property found on functions is not the only property using that name in JavaScript's prototypal inheritance model. Objects that are instances of constructors inherit from the constructor's <code>prototype</code> property and all objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. This property is aliased in script as <code>\__proto__</code> and referred to as the "dunder" prototype. The way to differentiate between the two is to think of a function's <code>prototype</code> property as the one used to create new objects, whilst the dunder proto is a property on objects used to lookup properties in the prototype chain.
 
 ```javascript
 var Foo = function(){}

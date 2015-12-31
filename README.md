@@ -467,7 +467,7 @@ half(100);  // 50
 
 ### IIFE
 
-It is possible to create closure like effects at runtime through the use of IIFEs (Immediately Invoked Function Expressions). An IIFE is a function wrapped in an expression and immediatley called<code>(function(){})()</code>. Whereas with closures, variables are able to be retrieved through reference, IIFEs run immediately so close around the value at the time of execution, essentially preserving a snapshot of the value at that point within the script. To illustrate that, consider the following example:
+It is possible to create closure like effects at runtime through the use of IIFEs (Immediately Invoked Function Expressions). An IIFE is a function wrapped in an expression and immediatley called<code>(function(){})()</code>. Whereas with closures, variables are able to be retrieved through reference, IIFEs run immediately so close around the value at the time of execution, essentially preserving a snapshot of the value at that point within the script. The closure similarity is more in the name, in that they close around values in scope at time of execution. They also, by virtue of them being functions, create their own scope which is inaccessible to anything outside of the IIFE, unless it returns. To demonstrate this, consider the following example:
 
 ```javascript
 var a = 1;

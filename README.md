@@ -404,7 +404,7 @@ What actually happens behind the scenes is not the same as using bind however. I
 A function's context is generated at runtime when the function is called. It's referenced in its execution context and available through the keyword <code>this</code>. Context is set organically - if it's used in a constructor function it's set to the instance of the constructor (takes precedence), or it's set to the call site of the function. This organic behaviour can be overriden and set explicitly through the use of call, apply, bind and fat arrow functions.
 
 ## Closures
-Understanding closures is something that can only really be done when after understanding at least a little of how lexical scoping and execution contexts in JavaScript work. Take the following example:
+Understanding closures is something that can only really be done after understanding at least a little of how lexical scoping and execution contexts in JavaScript work. Take the following example:
 
 ```javascript
 function bar() {
@@ -418,9 +418,9 @@ bar();  // a
 
 ```
 
-In the above the function foo has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function foo. When foo is called, the JavaScript engine looks up <code>a</code> in its immediate scope through its variable environment. It won't find it, so will then look it up against foo's parent scope, the function bar, where it will find it, and can log its value. This is, in very simple terms, a closure. The function foo has closed over the scope of the function bar (and anything in bar's parent scope, and so on until it reaches the global scope) and retains access to any variables in its scope.
+In the above the function <code>foo</code> has access to the variable <code>a</code> from its parent scope. This access is set in the compilation stage, so <code>a</code> is lexically scoped to the function <code>foo</code>. When <code>foo</code> is called, the JavaScript engine looks up <code>a</code> in its immediate scope through its variable environment. It won't find it, so will then look it up against its parent scope, the function <code>bar</code>, where it will find it, and can log its value. This is, in very simple terms, a closure. The function <code>foo</code> has closed over the scope of the function <code>bar</code> (and anything in bar's parent scope, and so on until it reaches the global scope) and retains access to any variables in its scope.
 
-The code above might help illustrate closures in their most simple form but it doesn't demonstrate their usefulness as a pattern, not without a small modification. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
+The code illustrates closures in their most literal form but it doesn't demonstrate their usefulness, not without a small modification. In JavaScript functions are first class values, which means they are treated like all other values and can be passed as arguments into and returned from functions. Consider the following, a modified version of the previous code example:
 
 ```javascript
 function bar() {
@@ -438,7 +438,7 @@ foo();  // bar
 
 In this example the function foo is returned from the function bar. The variable <code>a</code> is lexically scoped to foo and any descendant scopes. It's not available outside of the scope of bar. However, by creating a variable <code>foo</code> in the global scope and assigning it to the return value of bar, which is a function, when we call that function we get access to <code>a</code>, even though the call is made outside of the lexical scope of <code>a</code>.
 
-This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope defined at the compilation stage is accessible at runtime even if the reference is made outside of the scope it was defined in. This ability is provided by the variable environment created at runtime when <code>bar</code> is called. In the above the function <code>bar</code> has returned and is no longer in use, yet closures still allow access to values defined inside functions that have returned. To help illustrate a more practical use of closures consider the following piece of code;
+This is the crux of closures. It is the ability to access values outside of their lexical scope. Lexical scope is accessible at runtime even if the reference lookup is made outside of the scope the reference was defined in. This ability is provided by the variable environment created as part of the function's execution context which is created when <code>bar</code> is called. In the above the function <code>bar</code> has returned and is no longer in use, yet through a closure we can still get access to values defined in its lexical environment. To help illustrate a more practical use of closures consider the following:
 
 ```javascript
 function percentage(percent) {
@@ -454,7 +454,7 @@ vat(30);  // 6
 
 The function <code>percentage</code> calculates the percentage of a number. The percentage is determined by the value of the argument it accepts. Its return value however is not the calculated answer - how could it be? At this point there is no value to calculate against - the return value is a function. It is this returned function that accepts the value to calculate the percentage of. 
 
-What has happened is the returned function has closed over the scope of its parent. At compilation time the value of <code>percent</code> is undefined, but this doesn't matter - the returned function still has access to its reference through scope. When the percentage function is called the value it gets called with defines <code>percent</code>, essentially pre-loading the returned function with one of the two values needed to make the calculation. Now when the returned function is called, it calculates the pre-loaded percent of the value it's passed. This technique is often referred to as partial application or currying and allows functions like percentage to be re-used over and over producing new functions pre-loaded with different values.
+What's happened is the returned function has closed over the scope of its parent. At compilation time the value of <code>percent</code> is undefined, but this doesn't matter - the returned function still has access to its reference through scope. When the percentage function is called the value it gets called with defines <code>percent</code>, essentially pre-loading the returned function with one of the two values needed to make the calculation. Now when the returned function is called, it calculates the pre-loaded percent of the value it's passed. This technique is often referred to as partial application or currying and allows functions like percentage to be re-used over and over producing new functions pre-loaded with different values.
 
 ```javascript
 var vat = percentage(20);
@@ -528,9 +528,9 @@ As <code>i</code> is block scoped it is only available within the for loop block
 
 ### Summary
 
-Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to that value. 
+Closures can be thought of as a tool to allow runtime access to variables outside of their lexical scope. Their use is best demonstrated when functions return functions, and the returned function has within it a reference to a value that is not in its immediate scope. That reference has essentially been trapped in that function, and no matter where you call this returned function from it will have access to its value. 
 
-IIFEs work in a similar way, only they close over the current value of the variable they reference at runtime. They are expressions and contain a function that is immediately invoked inside them. This immediate invocation forces the function scope to close over the values of variables it references that are within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
+IIFEs work in a similar way, only they close over the current value of the variable they reference at runtime. The immediate invocation forces the function scope to close over the values of references within its lexical scope, creating what can be thought of as a snapshot of their value at that time. 
 
 ## The Call Stack
 

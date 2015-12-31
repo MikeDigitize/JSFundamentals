@@ -31,7 +31,7 @@ function foo() {
   var bar = "bar";
 }
 
-console.log(bar); // error - bar is not available outside of the function scope
+console.log(bar); // error - bar is unavailable outside of the scope of `foo`
 
 ```
 
@@ -153,11 +153,11 @@ After the compilation stage the <code>x</code> variable declared with var is hoi
 
 ### Summary
 
-Variables declared with var or function are hoisted to the top of their parent scope in the compilation stage before the code is executed. Variables are declared but are not assigned their specified value. Value assignment happens at run time, not compile time. Initially the value of all variables is set to undefined. Function declarations are evaluated at compile time. Function expressions are just variables and so are treated as a variable. Their value is likewise assigned at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in an error. This area before they are assigned a value is known as the temporal dead zone.
+Functions and variables declared with <code>var</code> are hoisted to the top of their parent scope by the compiler before execution. The compiler hoists the identifier but not the value assignment, so initially the value of all variables by default will be <code>undefined</code>. Function declarations are hoisted in their entirety. Function expressions are just variables and so are treated like variables in they are declared but not assigned a value. Value assignment happens at runtime. Variables declared with let and const are not hoisted and any attempt to reference them before their value is assigned will result in a reference error. This area before they are assigned a value is known as the temporal dead zone.
 
 ## The Execution Context
 
-The execution context is dynamically generated at runtime. It can be thought of as an object which is generated whenever a function is called. Upon a function call, the JavaScript interpreter creates the object and attaches to it references to everything in its lexical scope. This is known as the function's <code>variable environment</code> or, prior to ES5, its <code>activation object</code>. The <code>environment</code> contains all references in that function's immediate scope including its arguments and has access to its non-immediate lexical scope through a reference to it's parent's <code>variable environment</code>.
+The execution context can be thought of as an object, dynamically generated whenever a function is called, that holds references to everything in that function's lexical scope, in what is known as the function's <code>variable environment</code> or, prior to ES5, its <code>activation object</code>. The <code>variable environment</code> contains references to everything in that function's immediate scope, including its arguments, and has access to its non-immediate lexical scope through a reference to it's parent's <code>variable environment</code>.
 
 This means any function, when called, has access to its parent's scope, and its parent's parent scope, all the way up to the global scope. When looking up variable references the JavaScript interpreter checks against a function's immediate scope. If the variable isn't found it checks against its parent, and then its parent's parent until finally it reaches the global scope where, if it's not found, throws a reference error.
 
@@ -180,7 +180,7 @@ The variable <code>foobar</code> is defined in the scope of <code>bar</code> and
 
 ### Summary
 
-At runtime, when a function is called, the JavaScript engine creates an excution context for that function. This can be thought of as an object representing that function's <code>variable environment</code> and holds references to everything in its immediate scope and a link to its parent's <code>variable environment</code>. When asked to lookup a variable referenced within the function, the interpreter first checks against the function's immediate scope via its <code>environment</code>. If it doesn't find it there, it continues to search against each parent until it reaches the global scope. Only after it cannot find it in he global scope will the interpreter throw a reference error.
+At runtime, when a function is called, the JavaScript engine creates an excution context for that function. This can be thought of as an object that holds, amongs other things, references to everything in its lexical scope. This part of the execution context is known as the <code>variable environment</code>. The <code>variable environment</code> contains everything in the function's immediate scope and also contains a link to its parent's <code>variable environment</code>. When asked to lookup a variable referenced within the function, the interpreter first checks against the function's immediate scope, if it doesn't find it there it continues to search against each parent scope until it reaches the global scope. Only after it cannot find it in the global scope will the interpreter throw a reference error.
 
 ## Context
 

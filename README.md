@@ -1,5 +1,174 @@
 # AOJSGuide
-A guide to JavaScript.
+A guide to the nuts and bolts of JavaScript.
+
+## Data Types
+
+As of ES6 there are seven different data types in JavaScript - 
+
+* String
+* Number
+* Boolean
+* Undefined
+* Symbol
+* Object
+
+### Primitives and Objects
+
+All types, except objects, are known as primitives. All primitive values are immutable (values that are incapable of being changed). When creating a primitive as a type literal - i.e. without the use of its constructor - the primitive simply represents a value of that type in memory, therefore leaving a very small memory footprint. Consider the following:
+
+```javascript
+// primitive string
+var foo = "foo";
+typeof foo === "string";  // true
+// primitive number
+var bar = 1;
+typeof bar === "number";  // true
+// primitive boolean
+var foobar = true;
+typeof foobar === "boolean";  // true
+
+//primitive values
+foo;  // foo
+bar;  // 1
+foobar; // true
+
+// object string
+var foo = new String("foo");
+typeof foo === "object";  // true
+// object number
+var bar = new Number(1);
+typeof bar === "object";  // true
+// object boolean
+var foobar = new Boolean(true);
+typeof foobar === "object";  // true
+
+// object value
+foo;  // String { 0: "s", 1: "t", 2: "r", length: 3, [[PrimitiveValue]]: "str" }
+bar;  // Number { [[PrimitiveValue]]: 1 }
+foobar; // Boolean { [[PrimitiveValue]]: true }
+
+```
+
+The above demonstrates the difference in resulting value when defining a variable as a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive. But what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
+
+When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access to static and prototypal properties. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
+
+```javascript
+// primitive
+var foo = "foo";
+// temporary access to an object property 
+foo.length; // 3
+// restored to primitive
+typeof foo; // string
+// set property
+foo.bar = "bar";
+// primitives are immutable
+foo.bar;  // undefined
+
+```
+
+### Null and Undefined
+
+Null and Undefined are both types in JavaScript. The difference between the two is simply a case of implict or explicit declaration. Both are meant to represent a yet to be determined value. However, a null value has to be explicitly declared, it does not occur organically, unlike a value of undefined which is automatically assigned to a variable that is declared but not defined.
+
+```javascript
+// foo is declared but its value is yet to be determined
+var foo;
+foo;  // undefined
+
+// explictly declared that its value is yet to be determined
+foo = null;
+foo;  // null
+
+```
+
+A common source of confusion between the two comes from the result of the <code>typeof</code> operator when used against them. Pre ES6 Undefined is recognised as a type but Null, due to a bug in the ECMAScript implementation, is interpreted as an object.
+
+```javascript
+var foo;
+typeof foo === "undefined"; // true
+
+var bar = null;
+typeof bar === "object"; // true
+
+```
+
+Pre ES6, null was the only way to declare properties of objects that were yet to be defined.
+
+```javascript
+// Pre ES6, a yet to be determined value within an object
+var foo = { bar : null };
+foo.bar;  // null
+
+// ES6 via object destructuring
+var bar;
+var foo = { bar };
+foo.bar;  // undefined
+
+```
+
+### Variable binding and unbinding
+
+JavaScript is a weakly typed, dynamic language which means that firstly variables do not have to be declared with a specific type and secondly that variables can be rebound from one value (regardless of type) to another.
+
+```javascript
+var obj = {};
+typeof obj === "object"; // true
+obj = function(){};
+typeof obj === "function"; // true
+
+```
+
+In JavaScript functions and variables are given names to associate them with the objects or values they represent. The names given are often referred to as identifiers or references. It is important to remember whenever dealing with idenitifiers that they point only at values and not at each other. Consider the following example:
+
+```javascript
+var foo = { name : "bar" };
+var bar = foo;
+
+bar.name; // bar
+foo === bar;  // true
+
+```
+
+It wouldn't be unreasonable after seeing the above to think that <code>bar</code> is a reference to <code>foo</code> as, firstly we assigned <code>bar</code> to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
+
+```javascript
+// re-assign `foo` to a new object
+foo = { name : "foo" };
+
+// `bar` still points to the old object
+bar.name; // bar
+// therefore their values are no longer the same
+foo === bar;  // false
+
+```
+
+Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's a concept often not fully appreciated and is worth highlighting.
+
+### Mutation
+
+Mutation is similar to but not the same as rebinding. Rebinding affects the identifiers whilst mutation affects the values. Consider the following:
+
+```javascript
+var foo = { name : "bar" };
+// mutation
+foo.name = "foo";
+// rebinding
+foo = { name : "foo" };
+
+// rebinding
+foo = [1, 2, 3];
+// mutation
+foo.push(4);
+// mutation
+foo[0] = 0;
+
+```
+
+### Summary
+
+Variables defined as type literals, besides object, are known as primitives. They are represented in memory as their primitive values. Variables defined from a type constructor are objects and are stored in memory as objects. They consequently contain all properties from their constructor's prototype and therefore have a larger memory footprint than primitives. Since primitives can still temporarily access properties on their type constructor's prototype they are nearly always the preferable choice when defining variables over their constructor counterparts. When pointing a variable at another, the identifier points to its value, not to the reference itself.
+
 
 ## The JavaScript Compiler
 
@@ -35,7 +204,7 @@ console.log(bar); // error - bar is unavailable outside of the scope of `foo`
 
 ```
 
-Your data and data operators are described either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them (explained later).
+Data and data operators are described either as variables or functions. The compiler determines function availability in the same way it does with variables, so functions declared within functions are not available outside of their parent. Functions can be written either as declarations or expressions, the difference between the two is in the way the compiler handles them (explained later).
 
 ```javascript
 // declaration
@@ -1130,173 +1299,3 @@ Greeting can still be extended through its prototype, however with this pattern 
 ### Summary
 
 There are a plethora of possible ways to create objects in JavaScript, each with certain characteristics or idiosyncracies that give them specific advantages or disadvantages in relation to other patterns.
-
-
-## Data Types
-
-As of ES6 there are seven different data types in JavaScript - 
-
-* String
-* Number
-* Boolean
-* Undefined
-* Symbol
-* Object
-
-### Primitives and Objects
-
-All types, except objects, are known as primitives. All primitive values are immutable (values that are incapable of being changed). When creating a primitive as a type literal - i.e. without the use of its constructor - the primitive simply represents a value of that type in memory, therefore leaving a very small memory footprint. Consider the following:
-
-```javascript
-// primitive string
-var foo = "foo";
-typeof foo === "string";  // true
-// primitive number
-var bar = 1;
-typeof bar === "number";  // true
-// primitive boolean
-var foobar = true;
-typeof foobar === "boolean";  // true
-
-//primitive values
-foo;  // foo
-bar;  // 1
-foobar; // true
-
-// object string
-var foo = new String("foo");
-typeof foo === "object";  // true
-// object number
-var bar = new Number(1);
-typeof bar === "object";  // true
-// object boolean
-var foobar = new Boolean(true);
-typeof foobar === "object";  // true
-
-// object value
-foo;  // String { 0: "s", 1: "t", 2: "r", length: 3, [[PrimitiveValue]]: "str" }
-bar;  // Number { [[PrimitiveValue]]: 1 }
-foobar; // Boolean { [[PrimitiveValue]]: true }
-
-```
-
-The above demonstrates the difference in resulting value when defining a variable as a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive. But what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
-
-When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access to static and prototypal properties. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
-
-```javascript
-// primitive
-var foo = "foo";
-// temporary access to an object property 
-foo.length; // 3
-// restored to primitive
-typeof foo; // string
-// set property
-foo.bar = "bar";
-// primitives are immutable
-foo.bar;  // undefined
-
-```
-
-### Null and Undefined
-
-Null and Undefined are both types in JavaScript. The difference between the two is simply a case of implict or explicit declaration. Both are meant to represent a yet to be determined value. However, a null value has to be explicitly declared, it does not occur organically, unlike a value of undefined which is automatically assigned to a variable that is declared but not defined.
-
-```javascript
-// foo is declared but its value is yet to be determined
-var foo;
-foo;  // undefined
-
-// explictly declared that its value is yet to be determined
-foo = null;
-foo;  // null
-
-```
-
-A common source of confusion between the two comes from the result of the <code>typeof</code> operator when used against them. Pre ES6 Undefined is recognised as a type but Null, due to a bug in the ECMAScript implementation, is interpreted as an object.
-
-```javascript
-var foo;
-typeof foo === "undefined"; // true
-
-var bar = null;
-typeof bar === "object"; // true
-
-```
-
-Pre ES6, null was the only way to declare properties of objects that were yet to be defined.
-
-```javascript
-// Pre ES6, a yet to be determined value within an object
-var foo = { bar : null };
-foo.bar;  // null
-
-// ES6 via object destructuring
-var bar;
-var foo = { bar };
-foo.bar;  // undefined
-
-```
-
-### Variable binding and unbinding
-
-JavaScript is a weakly typed, dynamic language which means that firstly variables do not have to be declared with a specific type and secondly that variables can be rebound from one value (regardless of type) to another.
-
-```javascript
-var obj = {};
-typeof obj === "object"; // true
-obj = function(){};
-typeof obj === "function"; // true
-
-```
-
-In JavaScript functions and variables are given names to associate them with the objects or values they represent. The names given are often referred to as identifiers or references. It is important to remember whenever dealing with idenitifiers that they point only at values and not at each other. Consider the following example:
-
-```javascript
-var foo = { name : "bar" };
-var bar = foo;
-
-bar.name; // bar
-foo === bar;  // true
-
-```
-
-It wouldn't be unreasonable after seeing the above to think that <code>bar</code> is a reference to <code>foo</code> as, firstly we assigned <code>bar</code> to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
-
-```javascript
-// re-assign `foo` to a new object
-foo = { name : "foo" };
-
-// `bar` still points to the old object
-bar.name; // bar
-// therefore their values are no longer the same
-foo === bar;  // false
-
-```
-
-Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's a concept often not fully appreciated and is worth highlighting.
-
-### Mutation
-
-Mutation is similar to but not the same as rebinding. Rebinding affects the identifiers whilst mutation affects the values. Consider the following:
-
-```javascript
-var foo = { name : "bar" };
-// mutation
-foo.name = "foo";
-// rebinding
-foo = { name : "foo" };
-
-// rebinding
-foo = [1, 2, 3];
-// mutation
-foo.push(4);
-// mutation
-foo[0] = 0;
-
-```
-
-
-### Summary
-
-Variables defined as type literals, besides object, are known as primitives. They are represented in memory as their primitive values. Variables defined from a type constructor are objects and are stored in memory as objects. They consequently contain all properties from their constructor's prototype and therefore have a larger memory footprint than primitives. Since primitives can still temporarily access properties on their type constructor's prototype they are nearly always the preferable choice when defining variables over their constructor counterparts. When pointing a variable at another, the identifier points to its value, not to the reference itself.

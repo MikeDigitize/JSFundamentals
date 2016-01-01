@@ -1083,7 +1083,7 @@ Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ### Object.Create
 
-The use of constructors and the <code>new</code> keyword is often controversial in JavaScript. Some developers prefer the readability and easy to grasp semantics, whilst others say they wrongly imply a similarity to Java's class based constructor pattern, see below, encouraging developers to write JavaScript through a paradigm not suited to the language's strengths.
+The use of constructors and the <code>new</code> keyword is often controversial in JavaScript. Some developers prefer their readability and easy to grasp semantics, whilst others say they wrongly imply a similarity to Java's class based constructor pattern, see below, encouraging developers to write JavaScript through a paradigm not suited to the language's strengths.
 
 ```java
 // java constructor
@@ -1117,10 +1117,11 @@ foo.foobar = "foobar";
 bar.foobar; // foobar - accessed via __proto__ link to `foo`
 bar.foobar = "barfoo";
 foo.foobar; // foobar - inheritance flows down the chain, not up it
+bar.__proto__ === foo.prototype;  // false - `foo` is not a constructor function
 
 ```
 
-In the above <code>bar</code> is a copy of <code>foo</code>. Properties that are inherited from <code>foo</code> are available via lookup through its <code>\__proto__</code> property. Any changes to <code>foo</code> will be reflected in <code>bar</code>. The JavaScript interpreter when looking for properties, like always, first checks against the instance, before checking against the object's prototype chain.
+In the above <code>bar</code> is a copy of <code>foo</code>. Properties that are inherited from <code>foo</code> are available via lookup through its <code>\__proto__</code> property. Any changes to <code>foo</code> will be reflected in <code>bar</code>. The JavaScript interpreter, when looking for properties, first checks against the instance before checking against the object's prototype chain.
 
 Prototyping is of course possible with <code>Object.create</code>. Consider the following:
 
@@ -1134,7 +1135,7 @@ foo.__proto__;  // Foo
 
 ```
 
-<code>Object.create</code> also takes an object as a second parameter that defines properties for that instance, including getters and setters. Consider the following:
+<code>Object.create</code> can take an object as a second parameter that defines properties for that instance, including getters and setters. Consider the following:
 
 ```javascript
 // constructor / new inheritance pattern
@@ -1154,9 +1155,9 @@ foo.bar;  // foobar
 
 ### Summary
 
-Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from other objects or functions. Its facilitated either through the use of a function - the constructor - and the <code>new</code> keyword or an object and it's [[Prototype]] property, known as the dunder proto property and written as <code>\__proto__</code>. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance. 
+Prototypal inheritance is the mechanism JavaScript uses to allow objects to inherit from other objects or functions. Its facilitated either through the use of a function - the constructor - and the <code>new</code> keyword or an object and it's [[Prototype]] property, known as the dunder proto property and written as <code>\__proto__</code>. Whenever a new instance of a constructor is created it inherits any properties that are on the constructor's <code>prototype</code> property. The link between the instance and the constructor remains even after the new instance has been created. Subsequent additions or changes to any property on the <code>prototype</code> will be reflected on every instance.
 
-Any properties added to the constructor directly are known as static properties and are available only via the constructor and not on any instances of it. The dunder prototype is a newly standardised property (previously implementations differed from engine to engine) which points to the prototype of an object's constructor, traversal of which is the underlying way in which JavaScript looks up properties against an object's prototype chain. ES5 saw the introduction of <code>Object.create</code>, a static method on the <code>Object</code> function for use as an alternative (and more inline with JavaScript's prototypal nature) to the constructor / new pattern. 
+Any properties added to the constructor directly are known as static properties and are available only via the constructor and not on any instances of it. The dunder prototype is a newly standardised property (previously implementations differed from engine to engine) which points to the prototype of an object's constructor, traversal of which is the underlying way in which JavaScript looks up properties against an object's prototype chain. ES5 saw the introduction of <code>Object.create</code>, a static method on the <code>Object</code> function, as an alternative to the constructor / new pattern. 
 
 
 ## JavaScript Design Patterns

@@ -46,7 +46,7 @@ var foo = function() {}
 
 ```
 
-### Let and const
+### Block scope
 
 ES6 introduced two new ways for variables to be declared - <code>const</code> and <code>let</code>. These both have different scoping criteria to var and function, and are also handled differently by the compiler. Const and let are lexically block scoped which means they are available only within the block <code>{ }</code> they are declared in.
 
@@ -559,10 +559,7 @@ var globalExecutionStack = {
   scope : null,
   variableEnvironment : {
     foo : null,
-    bar : function bar() {
-      var bar = "bar";
-      return `${foo}${bar}`;
-    }
+    bar : <function>
   }
 }
 callStack.push(globalExecutionStack);
@@ -583,15 +580,20 @@ callStack.push(barExecutionContext);
 // assign bar a value and store in current execution context
 callStack[1].variableEnvironment.bar = "bar";
 // `bar` returns a reference to `foo` which is outside it's lexical scope
+// check for it in the immediate scope of `bar`
 callStack[1].variableEnvironment.foo; // undefined;
+// check for it in the parent scope of `bar`
 callStack[0].variableEnvironment.foo; // foo
-// once function returns remove current execution context
-callStack.shift();
+// return concat of the inner `bar` and `foo` - "foobar"
+// once `bar` has returned remove its execution context from the stack
+callStack.splice(1,1);
 
-// return to last operation in global context
+// previous context resumes control
 // console log done
-// remove current execution context
-callStack.shift();
+// remove global execution context from stack
+callStack.splice(0,1);
+
+// execution ends
 
 ```
 

@@ -963,7 +963,9 @@ Prototypal inheritance is a clearly useful pattern but there are a few limitatio
 
 ### [[Prototype]]
 
-Things can become a little confusing regarding JavaScript's inheritance model when you discover that it is not the explicit property <code>prototype</code> property found on functions is not the only property using that name in JavaScript's prototypal inheritance model. Objects that are instances of constructors inherit from the constructor's <code>prototype</code> property and all objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. This property is aliased in script as <code>\__proto__</code> and referred to as the "dunder" prototype. The way to differentiate between the two is to think of a function's <code>prototype</code> property as the one used to create new objects, whilst the dunder proto is a property on objects used to lookup properties in the prototype chain.
+Things can become a little confusing regarding JavaScript's inheritance model when you discover that the <code>prototype</code> property has a counterpart - also known as prototype - that's used to link prototypically bound objects together in JavaScript's prototypal inheritance model. 
+
+Objects that are instances of constructors inherit from the constructor's <code>prototype</code> property. All objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. This property is aliased in script as <code>\__proto__</code> and referred to as the "dunder" prototype. The way to differentiate between the two is to think of a function's <code>prototype</code> property as the one used to create new objects, whilst the dunder proto is a property on objects used to lookup properties in their prototype chain.
 
 ```javascript
 var Foo = function(){}

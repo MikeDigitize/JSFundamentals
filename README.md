@@ -1,5 +1,5 @@
 # AOJSGuide
-A guide to the nuts and bolts of JavaScript.
+A guide to the nuts and bolts of JavaScript for my team at AO.com.
 
 ## Data Types
 

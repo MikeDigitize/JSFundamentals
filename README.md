@@ -9,8 +9,9 @@ As of ES6 there are seven different data types in JavaScript -
 * Number
 * Boolean
 * Undefined
-* Symbol
+* Null
 * Object
+* Symbol (ES6)
 
 ### Primitives and Objects
 
@@ -32,6 +33,7 @@ foo;  // foo
 bar;  // 1
 foobar; // true
 
+// object wrappers around primitive values
 // object string
 var foo = new String("foo");
 typeof foo === "object";  // true
@@ -42,16 +44,33 @@ typeof bar === "object";  // true
 var foobar = new Boolean(true);
 typeof foobar === "object";  // true
 
-// object value
+// actual object value
 foo;  // String { 0: "s", 1: "t", 2: "r", length: 3, [[PrimitiveValue]]: "str" }
 bar;  // Number { [[PrimitiveValue]]: 1 }
 foobar; // Boolean { [[PrimitiveValue]]: true }
+
+// objects are coerced into primitive values for loose equality checks
+foo == "foo"; // true
+// but strict equality is type checked
+foo === "foo";  // false
+
+// primitives are just simple values
+var foo = "foo";
+var bar = "foo";
+foo == bar; // true
+foo === bar;  // true
+
+// constructors are objects
+var foo = new Object("foo");
+var bar = new Object("foo");
+foo == bar; // false
+foo === bar;  // false
 
 ```
 
 The above demonstrates the difference in resulting value when defining a variable as a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive. But what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
 
-When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access to static and prototypal properties. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
+When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access prototypal properties and object-like behaviour. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
 
 ```javascript
 // primitive

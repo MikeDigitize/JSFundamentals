@@ -3,13 +3,14 @@ A guide to the nuts and bolts of JavaScript for my team at AO.com.
 
 ## Data Types
 
-As of ES6 there are seven different data types in JavaScript - 
+As of ES6 there are eight different data types in JavaScript - 
 
 * String
 * Number
 * Boolean
 * Undefined
 * Null
+* Function
 * Object
 * Symbol (ES6)
 

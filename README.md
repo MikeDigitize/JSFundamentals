@@ -801,7 +801,7 @@ During execution, whenever a function is called, an execution context for the fu
 
 ## Prototypal inheritance
 
-JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are just callable objects. They can have properties and methods like any other object yet the two should be thought of as two distinct constructs; two constructs which essentially form the building blocks of JavaScript as a language. 
+JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are just callable objects. They can have properties and methods like any other object yet the two should be thought of as two distinct constructs; two constructs which essentially form the building blocks of JavaScript as a language. Functions as such are recognised as a separate data type.
 
 
 ```javascript
@@ -812,20 +812,13 @@ typeof bar; // object
 var foobar = new Function();
 typeof foobar;  // function
 
-```
-
-JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. A prototype based system has two fundamental components - a <code>constructor</code>, which is a function, and a property on the function - <code>prototype</code>, which is an object. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property. The first step towards understanding prototypal inheritance is to recognise how the return value of a function differs when called with and without the <code>new</code> keyword.
-
-```javascript
-function A(){}
-
-var foo = A();
-foo; // undefined
-
-var bar = new A();
-bar; // {}
+typeof Date;  // function
+typeof RegExp;  // function
+typeof Function;  // function
 
 ```
+
+JavaScript's inheritance model is not class based like other OOP languages such as Java or C#, it is prototype based. From some angles the two may appear synoymous but despite their similarities there are actually some rather fundamental differences. There are numerous ways to implement an inheritance model in JavaScript but to start with we'll look at the tradtional way via a constructor. Constructors create objects. Every object you use within JavaScript has been created by a constructor. Every object created has a <code>constructor</code> property.
 
 ### The Constructor property
 
@@ -841,7 +834,7 @@ foo();  // foo
 
 ```
 
-With a standard function call, a function executes its function body and returns. A function always returns. Without an explicit return statement a function returns <code>undefined</code> which is why in the code example above <code>bar</code> logs <code>undefined</code>. However, When called with the keyword <code>new</code> the behaviour of a function is quite different. In this case the function becomes a constructor and without the need for an explicit return statement returns a new object - a new instance. This object has a <code>constructor</code> property. 
+With a standard function call, a function executes its function body and returns. A function always returns. Without an explicit return statement a function returns <code>undefined</code> which is why in the code example above <code>bar</code> logs <code>undefined</code>. However, when called with the <code>new</code> keyword the behaviour of a function is quite different. In this case the function becomes a constructor and without the need for an explicit return statement returns a new object - a new instance. And this object has a <code>constructor</code> property. 
 
 ```javascript
 function Bar() {}
@@ -855,7 +848,7 @@ Whilst the <code>constructor</code> property implies by name that it is a refere
 
 ### The Prototype property
 
-When a function is declared, the function object that's created as a result implicilty inherits a <code>prototype</code> property - an empty object. It is this property that instances of a function inherit from. The below example demonstrates how:
+When a function is declared, the function object that's created as a result implicilty inherits a <code>prototype</code> property. This property initially is just an empty object but any properties that are subsequently attached to it will be inherited when the function is used as a constructor. The below example demonstrates how:
 
 ```javascript
 function A(){}
@@ -866,9 +859,9 @@ foo.bar; // foobar
 
 ```
 
-In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating an implicit link between constructor and instance, behind the scenes. This implicit link on an instance is, confusingly, also known as the <code>[[Prototype]]</code> and will be explained shortly. 
+In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating the implicit link that remains between constructor and instance even after the instance is created. This is one aspect which differs to class based languages, when once an instance is created, the link between the two ends. This implicit link between an object and its constructor is facilitated via another implicilty created property, but this time on the instance, which is confusingly also known as the prototype (but is written as <code>[[Prototype]]</code>), and will be explained shortly. 
 
-The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance gets linked to the prototype of its constructor via its <code>[[Prototype]]</code>. Properties defined on the constructor's prototype do not get copied directly to new instance, but can be referenced as if they were through the prototype chain, facilitated by <code>[[Prototype]]</code>.
+The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor - and this instance gets linked to the prototype of its constructor via its <code>[[Prototype]]</code>. An object's prototype property is referenced as <code>\__proto__</code> to separate it from a function's prototype property. Properties defined on the constructor's prototype do not get copied directly to new instance, but can be referenced as if they were through the prototype chain, facilitated by the instance's <code>[[Prototype]]</code> property.
 
 ```javascript
 function A(){}
@@ -891,6 +884,8 @@ function Greet(greeting) {
 }
 
 var hi = new Greet("hi");
+hi.__proto__ === Greet.prototype; // true
+hi.constructor === Greet; // true
 hi.greeting;  // hi
 
 // is the same behaviour as
@@ -908,7 +903,7 @@ hi.greeting;  // hi
 
 ### Extending prototypes
 
-Constructors created to provide a simple piece of functionality can be extended to create more complex pieces of functionality. Consider the following example of a constructor that gets and sets a DOM element:
+Constructors created to provide a simple piece of functionality can be extended to create more specific pieces of functionality. Consider the following example of a constructor that gets and sets a DOM element:
 
 ```html
 <p>This</p>
@@ -1002,7 +997,7 @@ Prototypal inheritance is a clearly useful pattern but there are a few limitatio
 
 Things can become a little confusing regarding JavaScript's inheritance model when you discover that the <code>prototype</code> property has a counterpart - also known as prototype - that's used to link prototypically bound objects together in JavaScript's prototypal inheritance model. 
 
-Objects that are instances of constructors inherit from the constructor's <code>prototype</code> property. All objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. This property is aliased in script as <code>\__proto__</code> and referred to as the "dunder" prototype. The way to differentiate between the two is to think of a function's <code>prototype</code> property as the one used to create new objects, whilst the dunder proto is a property on objects used to lookup properties in their prototype chain.
+Objects that are instances of constructors inherit from the constructor's <code>prototype</code> property. All objects also have an internal property that points to their constructor's <code>prototype</code>, a property that is also called, confusingly, prototype, but written in the ECMAScript spec as [[Prototype]]. This property is aliased in script as <code>\__proto__</code> and referred to as the "dunder" prototype. The way to differentiate between the two is to think of a function's <code>prototype</code> property as the one used to create new objects, whilst the dunder proto is used to lookup properties in an object's prototype chain.
 
 ```javascript
 var Foo = function(){}
@@ -1092,7 +1087,7 @@ foobar.constructor; // FooBar
 
 ```
 
-Whilst the <code>instanceof</code> operator returns an accurate result, when creating objects with the <code>new</code> keyword, the <code>constructor</code> property does not and needs to be explicitly set. The <code>instanceof</code> operator will return true on a constructor if an instance is part of its inheritance chain, not just if it's an immediate instance. Consider from the above example how <code>instanceof</code> returns for each of the instances:
+Whilst the <code>instanceof</code> operator returns an accurate result after creating objects with the <code>new</code> keyword, the <code>constructor</code> property does not and needs to be explicitly set. The <code>instanceof</code> operator will return true on a constructor if an instance is part of its inheritance chain, not just if it's an immediate instance. Consider from the above example how <code>instanceof</code> returns for each of the instances:
 
 ```javascript
 foobar instanceof FooBar; // true
@@ -1119,6 +1114,10 @@ var foo = { a : "a", b : "b", c : "c" };
 Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ```
+
+### ES6 Classes
+
+ES6 introduced a new paradigm of inheritance through the <code>class</code> keyword. This was a controversial inclusion in the spec as the concern was it potentially adds further confusion to the already commonly misconceived prototype model. It is important to think of JavaScript classes as just syntactic sugar around the protoype model. Once that is understood, classes are a very convenient and clean way in which to implement inheritance.    
 
 ### Object.Create
 

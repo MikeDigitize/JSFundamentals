@@ -801,7 +801,8 @@ During execution, whenever a function is called, an execution context for the fu
 
 ## Prototypal inheritance
 
-JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are objects. They can have properties and methods like any other object. Despite that, functions and objects should be thought of as two separate constructs; two constructs which essentially form the building blocks of JavaScript. Whereas with other object constructs such as RegExp or Date, Function is <code>typeof</code> "function" and not "object."
+JavaScript is an object oriented language. Everything is an object or behaves like one. Functions are just callable objects. They can have properties and methods like any other object yet the two should be thought of as two distinct constructs; two constructs which essentially form the building blocks of JavaScript as a language. 
+
 
 ```javascript
 var foo = new Date();
@@ -828,15 +829,29 @@ bar; // {}
 
 ### The Constructor property
 
-A function always returns. Without an explicit return statement a function returns <code>undefined</code> which is why in the above <code>foo</code> logs as <code>undefined</code>. When called with <code>new</code> however a new object - the new instance - is returned. This object has a <code>constructor</code> property. 
+JavaScript condenses features that other languages separate into individual constructs like classes, constructors, procedures and modules into one single facilitator - the function. The behaviour of a function differs based on the manner in which it's called. Consider the following:
 
 ```javascript
-bar.constructor === A;  // true
-bar instanceof A; // true
+function bar() {}
+function foo() {
+    return "foo";
+}
+bar();  // undefined
+foo();  // foo
 
 ```
 
-Whilst the <code>constructor</code> property implies by name that it is a reference to the function it was created from, this is not always the case. We'll see why shortly. Any function in JavaScript can be used as a constructor function, but it will only be of any use in terms of inheritance if some additional setup has been carried out to the function beforehand. Before delving any further into the mechanics behind the constructor, let's look at an important detail of function definition. 
+With a standard function call, a function executes its function body and returns. A function always returns. Without an explicit return statement a function returns <code>undefined</code> which is why in the code example above <code>bar</code> logs <code>undefined</code>. However, When called with the keyword <code>new</code> the behaviour of a function is quite different. In this case the function becomes a constructor and without the need for an explicit return statement returns a new object - a new instance. This object has a <code>constructor</code> property. 
+
+```javascript
+function Bar() {}
+var bar = new Bar();
+bar.constructor === Bar;  // true
+bar instanceof Bar; // true
+
+```
+
+Whilst the <code>constructor</code> property implies by name that it is a reference to the function it was created from, this is not always the case, explained in the constructor gotchas section shortly. Any function in JavaScript can be used as a constructor, but it will only be of any use in terms of inheritance if some additional setup has been carried out to the function beforehand. Before delving any further into the mechanics behind the constructor, let's look at a crucial detail of function definition. 
 
 ### The Prototype property
 
@@ -851,9 +866,9 @@ foo.bar; // foobar
 
 ```
 
-In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating an implicit link between constructor and instance, behind the scenes. This implicit link on an instance is, confusingly, also known as the <code>[[Prototype]]</code> and will be detailed shortly. 
+In the above a <code>bar</code> property is set on the prototype property of <code>A</code>. Any instance of <code>A</code> now has access to that property, demonstrating an implicit link between constructor and instance, behind the scenes. This implicit link on an instance is, confusingly, also known as the <code>[[Prototype]]</code> and will be explained shortly. 
 
-The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance gets linked to the prototype of its constructor via its <code>[[Prototype]]</code>. Properties defined on the constructor's prototype do not appear on the instance, but can be referenced as if they were through the prototype chain, facilitated by <code>[[Prototype]]</code>.
+The above outlines how the <code>new</code> keyword alters a function's return value. But what exactly happens when <code>new</code> is used? Well firstly and most obviously a new object is created - the new instance of the constructor, and this instance gets linked to the prototype of its constructor via its <code>[[Prototype]]</code>. Properties defined on the constructor's prototype do not get copied directly to new instance, but can be referenced as if they were through the prototype chain, facilitated by <code>[[Prototype]]</code>.
 
 ```javascript
 function A(){}
@@ -865,9 +880,10 @@ foo.foobar; // foobar
 
 ```
 
-Secondly, the context of <code>this</code> in the constructor points to the new instance, and thirdly that context is implicitly set as the constructor's return value. If that's not clear, the following will likely explain it better:
+Secondly, the context of <code>this</code> in the constructor is pointed at the newly created object / instance, and thirdly that context is implicitly set as the constructor's return value. If all of that's not clear, the following will hopefully explain it better:
 
 ```javascript
+// contructor behaviour
 function Greet(greeting) {
   // `this` is set to any instance of Greet that's being instantiated
   this.greeting = greeting;
@@ -880,11 +896,12 @@ hi.greeting;  // hi
 // is the same behaviour as
 function Greet(greeting) {
   this.greeting = greeting;
+  this.__proto__ = Greet.prototype;
+  this.constructor = Greet;
   return this;
 }
 
-var hi = {};
-hi = Greet.call(hi, "hi");
+var hi = Greet.call({}, "hi");
 hi.greeting;  // hi
 
 ```

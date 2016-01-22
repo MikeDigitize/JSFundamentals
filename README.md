@@ -1148,7 +1148,7 @@ var bar = {
 
 ```
 
-Inherited properties now just need to be defined within the class and not on the <code>prototype<code> property.
+Inherited properties now just need to be defined within the class and not on the <code>prototype</code> property.
 
 ```javascript
 class Foo {

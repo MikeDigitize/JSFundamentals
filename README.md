@@ -1117,7 +1117,94 @@ Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ### ES6 Classes
 
-ES6 introduced a new paradigm of inheritance through the <code>class</code> keyword. This was a controversial inclusion in the spec as the concern was it potentially adds further confusion to the already commonly misconceived prototype model. It is important to think of JavaScript classes as just syntactic sugar around the protoype model. Once that is understood, classes are a very convenient and clean way in which to implement inheritance.    
+ES6 introduced a new paradigm of inheritance through the <code>class</code> keyword. This was a controversial inclusion in the spec as the concern was it potentially adds further confusion to the already commonly misconceived prototype model. JavaScript classes aren't the same as classes in languages like Java and C#, they're just syntactic sugar around the protoype model and provide a very convenient and clean way in which to implement inheritance. 
+
+```javascript
+class Foo {
+    constructor(bar) {
+        this.bar = bar;
+    }
+}
+
+// is equivalent to
+function Foo(bar) {
+    this.bar = bar;
+}
+
+```
+
+Whilst classes are more verbose, they also are more explicit. One thing to note from the example above is the use of ES6 object method shorthand which removes the need to define methods with a semi colon and the function keyword.
+
+```javascript
+// es5 method
+var foo = {
+    bar : function() {}
+}
+
+// es6 method
+var bar = {
+    foo() {}
+}
+
+```
+
+Inherited properties now just need to be defined within the class and not on the <code>prototype<code> property.
+
+```javascript
+class Foo {
+    constructor(name) {
+        this.name = name;
+    }
+    sayHi() {
+      return `hi ${this.name}`; 
+    }
+}
+
+var bar = new Foo("Mike");
+bar.sayHi();  // hi Mike
+
+```
+
+Static properties are now defined explicitly with the <code>static</code> keyword.
+
+```javascript
+class Foo {
+    constructor(name) {
+        this.name = name;
+    }
+    static bar() {
+        return "foobar";
+    }
+    sayHi() {
+      return `hi ${this.name}`; 
+    }
+}
+
+Foo.bar();  // foobar
+
+```
+
+Classes have in built getter and setter methods.
+
+```javascript
+class Foo {
+    constructor(name) {
+        this.name = name;
+    }
+    sayHi() {
+      return `hi ${this.name}`; 
+    }
+    get prop() {
+        return this.name;
+    }
+    set prop(name) {
+        this.name = name;
+    }
+}
+
+Foo.bar();  // foobar
+
+```
 
 ### Object.Create
 

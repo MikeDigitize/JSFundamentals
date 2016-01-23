@@ -1196,7 +1196,33 @@ Foo.foo = "foo";  // allowed
 
 ```
 
-Classes can be extended to create sub classes. The below is the ES6 version of the earlier example of extending prototypes.
+Classes can be extended to create sub classes. 
+
+```javascript
+class Foo {
+    constructor(foo) {
+        this.foo = foo;
+    }
+}
+class Bar extends Foo {
+    constructor(foo, bar) {
+        super(foo); // calls the base class's constructor
+        this.bar = bar;
+    }
+}
+
+// is the equivalent of
+function Foo(foo) {
+    this.foo = foo;
+}
+function Bar(bar) {
+    this.bar = bar;
+}
+Bar.prototype = new Foo("foo");
+
+```
+
+The below is the ES6 version of the earlier example of extending prototypes.
 
 ```javascript
 // note that a constructor method is not required
@@ -1212,7 +1238,7 @@ class GetEl {
 // extend the base class
 class AddEvents extends GetEl {
     constructor() {
-        super(); // important
+        super();
         this.events = {};
     }
     add(evt, fn, capture) {

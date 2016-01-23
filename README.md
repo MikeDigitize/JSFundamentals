@@ -1150,7 +1150,7 @@ var bar = {
 
 ```
 
-Inherited properties now just need to be defined within the class and not on the <code>prototype</code> property.
+In class declarations inherited properties now just need to be defined within the class and not directly on the <code>prototype</code> property.
 
 ```javascript
 class Foo {
@@ -1167,7 +1167,7 @@ bar.sayHi();  // hi Mike
 
 ```
 
-Static properties are now defined explicitly with the <code>static</code> keyword. It's important to note that currently there is no support for static property values which are not functions. The intention behind this is that a class should outline its capabilities but not its member values. Non function values for static properties can still be hung directly off the class, external to the class definition (see example below).
+Static properties are now defined explicitly with the <code>static</code> keyword. It's important to note that currently there is no support for non-function based static property values. Non function values can however be hung directly off the class, external to the class definition (see example below).
 
 ```javascript
 class Foo {
@@ -1198,7 +1198,7 @@ Foo.foo = "foo";  // allowed
 
 ```
 
-Classes can be extended to create sub classes. 
+Classes can be extended to create sub classes explicitly through the use of the new <code>extends</code> keyword. In a sub class the <code>super</code> keyword is used to access the parent class's constructor.
 
 ```javascript
 class Foo {
@@ -1206,6 +1206,7 @@ class Foo {
         this.foo = foo;
     }
 }
+// explicit extends statement
 class Bar extends Foo {
     constructor(foo, bar) {
         super(foo); // calls the base class's constructor
@@ -1227,7 +1228,7 @@ Bar.prototype = new Foo("foo");
 The below is the ES6 version of the earlier example of extending prototypes.
 
 ```javascript
-// note that a constructor method is not required
+// note that in classes a constructor method is not required
 class GetEl {
     setDOM(selector) {
       this.DOM = Array.from(document.querySelectorAll(selector));
@@ -1272,14 +1273,14 @@ pEvts.remove("click");  // removes click listener from all p tags
 
 ```
 
-There's a couple of things to bear in mind when using classes. Firstly, classes are not hoisted like functions so an attempt to reference them before their definition will result in an error (TDZ). 
+There's a couple of things to bear in mind when using classes. Firstly, classes are not hoisted like functions so an attempt to reference them before their definition will result in an error as the reference is in the previously described Temporal Dead Zone. 
 
 ```javascript
 var foo = new Foo(); // reference error
 class Foo {}
 
 ```
-Secondly class declarations execute in their own scope and are not given a local reference. Consider the example below.
+Secondly class declarations execute in their own temporary scope and are not given a local reference. Consider the example below.
 
 ```javascript
 class Foo {}
@@ -1289,12 +1290,13 @@ var foo = new Foo();
 Once the above code has executed the variable <code>foo</code> is retained locally and therefore still accessible but the class declaration Foo is not.
 
 ```javascript
+// after the above has executed
 foo;  // {}
 Foo;  // reference error 
 
 ```
 
-However classes defined as expressions are retained in memory after execution.
+In order for a class declaration to be retained in memory it must be declared as an expression.
 
 ```javascript
 var Foo = class {}

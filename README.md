@@ -1117,7 +1117,7 @@ Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ### ES6 Classes
 
-ES6 introduced a new paradigm of inheritance through the <code>class</code> keyword. This was a controversial inclusion in the spec as the concern was it potentially adds further confusion to the already commonly misconceived prototype model. JavaScript classes aren't the same as classes in languages like Java and C#, they're just syntactic sugar around the protoype model and provide a very convenient and clean way in which to implement inheritance. 
+ES6 introduced a new paradigm of inheritance through the <code>class</code> keyword. This was a controversial inclusion in the spec as the concern was it potentially adds further confusion to the already commonly misconceived prototype model. JavaScript classes aren't the same as classes in languages like Java and C#, they're just syntactic sugar around the protoype model and provide a convenient and semantic way in which to implement inheritance. 
 
 ```javascript
 class Foo {
@@ -1165,7 +1165,7 @@ bar.sayHi();  // hi Mike
 
 ```
 
-Static properties are now defined explicitly with the <code>static</code> keyword.
+Static properties are now defined explicitly with the <code>static</code> keyword. It's important to note that currently there is no support for static property values which are not functions. The intention behind this is that a class should outline its capabilities but not its member values. Non function values for static properties can still be hung directly off the class, external to the class definition (see example below).
 
 ```javascript
 class Foo {
@@ -1182,27 +1182,99 @@ class Foo {
 
 Foo.bar();  // foobar
 
-```
-
-Classes have in built getter and setter methods.
-
-```javascript
+// only functions as static properties
 class Foo {
-    constructor(name) {
-        this.name = name;
-    }
-    sayHi() {
-      return `hi ${this.name}`; 
-    }
-    get prop() {
-        return this.name;
-    }
-    set prop(name) {
-        this.name = name;
+    static foo = "foo"; // error
+    static bar : "bar"; // error
+    static foobar() {
+        return "foobar"; // allowed
     }
 }
 
-Foo.bar();  // foobar
+// define property explicitly on class
+Foo.foo = "foo";  // allowed
+
+```
+
+Classes can be extended to create sub classes. The below is the ES6 version of the earlier example of extending prototypes.
+
+```javascript
+// note that a constructor method is not required
+class GetEl {
+    setDOM(selector) {
+      this.DOM = Array.from(document.querySelectorAll(selector));
+    }
+    getDOM() {
+      return this.DOM;
+    }
+}
+
+// extend the base class
+class AddEvents extends GetEl {
+    constructor() {
+        super(); // important
+        this.events = {};
+    }
+    add(evt, fn, capture) {
+      capture = capture ? capture : false; 
+      this.events[evt] = [];
+      this.DOM.forEach(el => {
+        let listener = { 
+          el : el,
+          evt : evt, 
+          fn : fn, 
+          capture : capture 
+        };
+        el.addEventListener(evt, fn, capture);
+        this.events[evt].push(listener);
+      }); 
+    }
+    remove(evt) {
+      this.events[evt].forEach(listener => {
+        listener.el.removeEventListener(listener.evt, listener.fn, listener.capture);
+      });
+      this.events[evt] = [];
+    }
+}
+
+var pEvts = new AddEvents();
+pEvts.setDOM("p");  // inherited from GetEl
+pEvts.add("click", () => console.log("click")); // adds click event to all p tags
+pEvts.remove("click");  // removes click listener from all p tags
+
+```
+
+There's a couple of things to bear in mind when using classes. Firstly, classes are not hoisted like functions so an attempt to reference them before their definition will result in an error (TDZ). 
+
+```javascript
+var foo = new Foo(); // reference error
+class Foo {}
+
+```
+Secondly class declarations execute in their own scope and are not given a local reference. Consider the example below.
+
+```javascript
+class Foo {}
+var foo = new Foo();
+
+```
+Once the above code has executed the variable <code>foo</code> is retained locally and therefore still accessible but the class declaration Foo is not.
+
+```javascript
+foo;  // {}
+Foo;  // reference error 
+
+```
+
+However classes defined as expressions are retained in memory after execution.
+
+```javascript
+var Foo = class {}
+var foo = new Foo();
+
+// after execution
+foo;  // {}
+Foo;  // function class {}
 
 ```
 

@@ -1117,7 +1117,7 @@ Object.keys(foo).forEach(key => console.log(key));  // a, b, c
 
 ### ES6 Classes
 
-ES6 introduced a new paradigm of inheritance through the <code>class</code> keyword. This was a controversial inclusion in the spec as the concern was it potentially adds further confusion to the already commonly misconceived prototype model. JavaScript classes aren't the same as classes in languages like Java and C#, they're just syntactic sugar around the protoype model and provide a convenient and semantic way in which to implement inheritance. 
+ES6 introduced classes and with them an alternative means of implementing inheritance. JavaScript classes aren't to be thought of as the same as classes in languages like Java and C#, they're just syntactic sugar around the protoype model and provide a convenient and semantic wrapper API around JavaScript's <code>new <constructor></code> pattern. 
 
 ```javascript
 class Foo {
@@ -1133,15 +1133,17 @@ function Foo(bar) {
 
 ```
 
-Whilst classes are more verbose, they also are more explicit. One thing to note from the example above is the use of ES6 object method shorthand which removes the need to define methods with a semi colon and the function keyword.
+Whilst classes are more verbose, they also are more explicit. One thing to note from the example above is the need to use the new more concise ES6 object method shorthand within class declarations. Inherited methods cannot be defined in a class using ES5 method syntax.
 
 ```javascript
-// es5 method
-var foo = {
-    bar : function() {}
+// would throw a syntax error
+class Foo {
+    bar : function(bar) {
+        this.bar = bar;
+    }
 }
 
-// es6 method
+// es6 method declaration ok
 var bar = {
     foo() {}
 }

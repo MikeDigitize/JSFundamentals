@@ -1076,17 +1076,17 @@ function AoEmployee(job) {
 
 ```
 
-If we wanted to extend the above <code>Person</code> constructor to allow the <code>AoEmployee</code> constructor to inherit from it, using the way we do it in the previous example we'd do it like this:
+If we wanted to extend the above <code>Person</code> constructor to <code>AoEmployee</code> to inherit from it, using the method from the previous example would look like this:
 
 ```javascript
-AoEmployee.prototype = new Person("Mike");
+AoEmployee.prototype = new Person("Mike"); // uh-oh
 var mike = new AoEmployee("developer");
 var john = new AoEmployee("CEO");
 john.name;  // Mike
 
 ```
 
-But then we'd have to commit a name value to it in Person's constructor, which means all instances of AoEmployee would inherit the same name. There are of course ways around the above but that defeats the purpose of creating an inheritance pattern. Instead in situations like this we can do the following:
+Using this method we'd have to commit a name value to the <code>Person</code> constructor when assigning its prototype to <code>AoEmployee</code>, which means all instances of AoEmployee would inherit that name. That's obviously not something we'd want to do. There are of course ways around the above but that defeats the purpose of creating an inheritance pattern. Instead in these situations we can do the following:
 
 ```javascript
 function Person(name) {
@@ -1106,7 +1106,7 @@ var john = new AoEmployee("John", "CEO");
 
 ```
 
-The above shows how by using <code>call</code> we can leverage the internals of the <code>Person</code> constructor from within the <code>AoEmployee</code> constructor to copy over instance properties. Using this method we're able to retain the pattern of inheritance without committing a value to the parent constructor that will be inherited by instances of the child constructor.
+The above shows how using <code>call</code> can leverage the internals of the <code>Person</code> constructor from within the <code>AoEmployee</code> constructor to copy across instance properties. Using this method we're able to retain the pattern of inheritance without committing a value to the parent constructor that will be inherited by all instances of the child constructor.
 
 ### Prototypal inheritance limitations
 

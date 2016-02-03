@@ -901,6 +901,78 @@ hi.greeting;  // hi
 
 ```
 
+### Object.Create
+
+The use of constructors either as classes or functions is often controversial in JavaScript. Some developers prefer their readability and easy to grasp semantics, whilst others say they wrongly imply a similarity to Java's class based constructor pattern, see below, encouraging developers to write JavaScript through a paradigm not suited to the language's strengths.
+
+```java
+// java constructor
+public Foo(int startBar) {
+    bar = startBar;
+}
+
+// instance
+Foo myFoo = new Foo(30);
+
+```
+
+ES5 saw the introduction of <code>Object.create</code>, designed as a counter to <code>new constructor</code>. It takes as an argument an object to copy and returns a new object with properties that point to those of its creator (properties specific to the object, not ones gained through its prototype chain). Consider the following:
+
+```javascript
+var foo = { foo : "foo", bar : "bar" };
+var bar = Object.create(foo);
+
+bar;  // Object
+foo === bar;  // false
+bar.__proto__ === foo;  // true
+
+foo.foo;  // foo - held on object `foo`
+bar.foo;  // foo - accessed via __proto__ link to `foo`
+
+bar.foo = "FOO";
+foo.foo = "bar";
+bar.foo;  // FOO - property on instance takes precedence over prototype chain
+
+foo.foobar = "foobar";
+bar.foobar; // foobar - accessed via __proto__ link to `foo`
+bar.foobar = "barfoo";
+foo.foobar; // foobar - inheritance flows down the chain, not up it
+bar.__proto__ === foo.prototype;  // false - `foo` is not a constructor function
+
+```
+
+In the above <code>bar</code> is a copy of <code>foo</code>. Properties that are inherited from <code>foo</code> are available via lookup through its <code>\__proto__</code> property. Any changes to <code>foo</code> will be reflected in <code>bar</code>. The JavaScript interpreter, when looking for properties, first checks against the instance before checking against the object's prototype chain.
+
+Prototyping is of course possible with <code>Object.create</code>. Consider the following:
+
+```javascript
+function Foo(){}
+Foo.prototype.bar = "bar";
+
+var foo = Object.create(Foo.prototype);
+foo.bar;  // bar
+foo.__proto__;  // Foo
+
+```
+
+<code>Object.create</code> can take an object as a second parameter that defines properties for that instance, including getters and setters. Consider the following:
+
+```javascript
+// constructor / new inheritance pattern
+function Foo(bar) {
+  this.bar = bar;
+}
+var foo = new Foo("foobar");
+foo.bar;  // foobar
+
+// the above using object create
+var foo =  Object.create(Foo.prototype, { 
+  bar : { writable: true, configurable: true, value: "foobar" }
+});
+foo.bar;  // foobar
+
+```
+
 ### Extending prototypes
 
 Constructors created to provide a simple piece of functionality can be extended to create more specific pieces of functionality. Consider the following example of a constructor that gets and sets a DOM element:
@@ -991,6 +1063,53 @@ pEvts.removeDOM();  // available on an instance of AddEvents through prototypal 
 
 ```
 
+But what if a constructor takes instance specific values when initialised?
+
+```javascript
+function Person(name) {
+    this.name = name;
+}
+
+function AoEmployee(job) {
+    this.job = job;
+}
+
+```
+
+If we wanted to extend the above <code>Person</code> constructor to allow the <code>AoEmployee</code> constructor to inherit from it, using the way we do it in the previous example we'd do it like this:
+
+```javascript
+AoEmployee.prototype = new Person("Mike");
+var mike = new AoEmployee("developer");
+var john = new AoEmployee("CEO");
+john.name;  // Mike
+
+```
+
+But then we'd have to commit a name value to it in Person's constructor, which means all instances of AoEmployee would inherit the same name. There are of course ways around the above but that defeats the purpose of creating an inheritance pattern. Instead in situations like this we can do the following:
+
+```javascript
+function Person(name) {
+    this.name = name;
+}
+
+function AoEmployee(name, job) {
+    this.job = job;
+    Person.call(this, name);
+}
+
+// copy parent constructor's prototype properties
+AoEmployee.prototype = Object.create(Person.prototype);
+
+var mike = new AoEmployee("Mike", "developer");
+var john = new AoEmployee("John", "CEO");
+
+```
+
+The above shows how by using <code>call</code> we can leverage the internals of the <code>Person</code> constructor from within the <code>AoEmployee</code> constructor to copy over instance properties. Using this method we're able to retain the pattern of inheritance without committing a value to the parent constructor that will be inherited by instances of the child constructor.
+
+### Prototypal inheritance limitations
+
 Prototypal inheritance is a clearly useful pattern but there are a few limitations with it. Firstly, it doesn't allow for private properties - everything must be attached to the instance at instantiation or through the prototype, making all its properties publicly available. Secondly, when extending prototypes there is no mechanism to inherit only the methods or properties that are needed - extending means inheriting everything, which is not always ideal. Thirdly, there is its over reliance on <code>this</code> and the potential for that reference to be overwritten by one of the means discussed earlier in the context chapter, making code within potentially brittle. 
 
 ### [[Prototype]]
@@ -1007,7 +1126,7 @@ foo.__proto__ === foo.constructor.prototype;  // true
 
 ```
 
-The <code>\__proto__</code> property has been standardised as of ES6 which now gives us another means to create objects, only this time not from constructors but from other objects.
+The <code>\__proto__</code> property has been standardised as of ES6 which can be used as another way to create objects, only this time not from constructors but from other objects.
 
 ```javascript
 var foo = { name : "foo" };
@@ -1054,7 +1173,7 @@ bar.__proto__.__proto__.foo; // foo
 
 ```
 
-JavaScript resolves object properties in the same way scope resolves references within functions and the global scope, only instead of using the variable environment / activation object, it uses the <code>[[Prototype]]</code> chain through the dunder proto property. The above examples essentially achieve the same thing. In both, when looking up properties, the JavaScript engine first looks to see if the property resides on the instance. If the engine doesn't find it there, it begins to traverse up the <code>[[Prototype]]</code> chain checking against each <code>\__proto__</code> object until it reaches Object's dunder prototype, which is where the chain ends and resolves as <code>null</code>. If the engine can't find the property on Object - the dunder proto equivalent of scope's global environment - <code>undefined</code> is returned. Changes to the source object will be reflected in any instances via the prototype chain, essentially producing a similar inheritance pattern to that achieved by a function's <code>prototype</code> property.
+JavaScript resolves object properties in the same way scope resolves references within functions and the global scope, only instead of using the variable environment / activation object, it uses the <code>[[Prototype]]</code> chain through the dunder proto property. The above examples essentially achieve the same thing. In both, when looking up properties, the JavaScript engine first looks to see if the property resides on the instance. If the engine doesn't find it there, it begins to traverse up the <code>[[Prototype]]</code> chain checking against each <code>\__proto__</code> object until it reaches Object's dunder prototype, which is where the chain ends and resolves as <code>null</code>. If the engine can't find the property on Object - the dunder proto equivalent of scope's global environment - <code>undefined</code> is returned. Changes to the source object will be reflected in any instances via the prototype chain, essentially producing the same inheritance pattern as a function's <code>prototype</code> property. Due to inconsistent implementation before standardisation the dunder prototype should probably not be relied upon to produce consistent behaviour in inheritance patterns.
 
 ### Constructor property gotchas
 
@@ -1305,78 +1424,6 @@ var foo = new Foo();
 // after execution
 foo;  // {}
 Foo;  // function class {}
-
-```
-
-### Object.Create
-
-The use of constructors either as classes or functions is often controversial in JavaScript. Some developers prefer their readability and easy to grasp semantics, whilst others say they wrongly imply a similarity to Java's class based constructor pattern, see below, encouraging developers to write JavaScript through a paradigm not suited to the language's strengths.
-
-```java
-// java constructor
-public Foo(int startBar) {
-    bar = startBar;
-}
-
-// instance
-Foo myFoo = new Foo(30);
-
-```
-
-ES5 saw the introduction of <code>Object.create</code>, designed as a counter to <code>new constructor</code>. It takes as an argument an object to copy and returns a new object with properties that point to those of its creator (properties specific to the object, not ones gained through its prototype chain). Consider the following:
-
-```javascript
-var foo = { foo : "foo", bar : "bar" };
-var bar = Object.create(foo);
-
-bar;  // Object
-foo === bar;  // false
-bar.__proto__ === foo;  // true
-
-foo.foo;  // foo - held on object `foo`
-bar.foo;  // foo - accessed via __proto__ link to `foo`
-
-bar.foo = "FOO";
-foo.foo = "bar";
-bar.foo;  // FOO - property on instance takes precedence over prototype chain
-
-foo.foobar = "foobar";
-bar.foobar; // foobar - accessed via __proto__ link to `foo`
-bar.foobar = "barfoo";
-foo.foobar; // foobar - inheritance flows down the chain, not up it
-bar.__proto__ === foo.prototype;  // false - `foo` is not a constructor function
-
-```
-
-In the above <code>bar</code> is a copy of <code>foo</code>. Properties that are inherited from <code>foo</code> are available via lookup through its <code>\__proto__</code> property. Any changes to <code>foo</code> will be reflected in <code>bar</code>. The JavaScript interpreter, when looking for properties, first checks against the instance before checking against the object's prototype chain.
-
-Prototyping is of course possible with <code>Object.create</code>. Consider the following:
-
-```javascript
-function Foo(){}
-Foo.prototype.bar = "bar";
-
-var foo = Object.create(Foo.prototype);
-foo.bar;  // bar
-foo.__proto__;  // Foo
-
-```
-
-<code>Object.create</code> can take an object as a second parameter that defines properties for that instance, including getters and setters. Consider the following:
-
-```javascript
-// constructor / new inheritance pattern
-function Foo(bar) {
-  this.bar = bar;
-}
-var foo = new Foo("foobar");
-foo.bar;  // foobar
-
-// the above using object create
-var foo =  Object.create(Foo.prototype, { 
-  bar : { writable: true, configurable: true, value: "foobar" }
-});
-foo.bar;  // foobar
 
 ```
 

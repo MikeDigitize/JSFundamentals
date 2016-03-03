@@ -1225,6 +1225,22 @@ foo.instanceof Foo;  // true
 
 ```
 
+### Preventing a function from being used as a constructor
+
+It's possible to prevent a function from being used as a constructor by checking the value of this from within the function. 
+
+```javascript
+function Foo() {
+    if(!Object.getOwnPropertyNames(this).length) {
+        throw new Error("Foo cannot be used as a constructor");
+    }
+    return "Foo";
+}
+
+```
+
+As a constructor sets the context of <code>this</code> to the empty object that gets returned as the instance of Foo, we can check to see if it has any properties of its own. If it doesn't than we know the function has been called with <code>new</code>.
+
 ### Static methods
 
 As functions are objects it's possible to store properties on the constructor itself. These are known as <code>static</code> properties. Any instances of the constructor do not inherit these properties as they're not on its <code>prototype</code>.

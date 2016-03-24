@@ -482,8 +482,8 @@ var count = new Total(0);
 count.calc(1,2,3);  // 6
 
 var startingValue = 10;
-total.call(this, 7, 1, 2);  // 20
-total.apply(this, [7, 1, 2]); // 20
+count.calc.call(this, 7, 1, 2);  // 20
+count.calc.apply(this, [7, 1, 2]); // 20
 
 ```
 

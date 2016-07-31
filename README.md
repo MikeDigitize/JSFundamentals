@@ -1230,16 +1230,25 @@ foo.instanceof Foo;  // true
 It's possible to prevent a function from being used as a constructor by checking the value of this from within the function. 
 
 ```javascript
-function Foo() {
-    if(!Object.getOwnPropertyNames(this).length) {
-        throw new Error("Foo cannot be used as a constructor");
-    }
-    return "Foo";
-}
+var Foo = function(x){
+  if (this instanceof Foo) {
+    throw new Error("Foo can't be used a constructor");
+  }
+  return x *=2;
+};
 
 ```
 
-As a constructor sets the context of <code>this</code> to the empty object that gets returned as the instance of Foo, we can check to see if it has any properties of its own. If it doesn't than we know the function has been called with <code>new</code>.
+We can quite easily check to see if `this` within the constructor is an instance of `Foo`. If it is then we know it's been called with `new`. We can use a smiliar method to eliminate the need to use `new` to initialise a constructor.
+
+```javascript
+var Foo = function(x){
+  if (!(this instanceof Foo)) {
+    return new Foo(x);
+  }
+  this.x = x *=2;
+};
+```
 
 ### Static methods
 

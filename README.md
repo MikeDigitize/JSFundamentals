@@ -1344,6 +1344,40 @@ Foo.foo = "foo";  // allowed
 
 ```
 
+### Getters and Setters
+
+ES6 classes provide a convenient `get` and `set` convention to allow specific property access and setting. 
+
+```javascript
+class A {
+      constructor(a) {
+            this.a = a;
+      }
+
+      get propA() {
+            console.log('get A');
+            return this.a;
+      }
+
+      set setPropA(val) {
+            console.log('set A');
+            this.a = val;
+      }
+
+}
+
+var a = new A(10);
+console.log(a.a); // 10
+console.log(a.propA); // get A 10
+a.setPropA = 100; // set A 100
+console.log(a.a); // 100
+
+```
+
+Notice how both appear in the class definition as methods but actually are just properties. This neatness can provide a cleaner and more explicit API for getting and setting.
+
+### Class Extends
+
 Classes can be extended to create sub classes explicitly through the use of the new <code>extends</code> keyword. In a sub class the <code>super</code> keyword is used to access the parent class's constructor.
 
 ```javascript

@@ -69,9 +69,9 @@ foo === bar;  // false
 
 ```
 
-The above demonstrates the difference in resulting value when defining a variable as a literal or via a constructor. As a constructor returns an object, the memory footprint of is obviously larger than that of a primitive. But what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value and doesn't inherit from the constructor. Fortunately this is not the case.
+The above demonstrates the difference in resulting value when defining a variable as a literal or via a constructor. As a constructor returns an object, the memory footprint of it is obviously larger than that of a primitive. But what if, for example, you had a primitive string that needed access to its length property (on the String prototype)? It wouldn't be unreasonable to assume the string would've needed to be created via its constructor to get access to this property, as a primitive is only the value. Fortunately this is not the case.
 
-When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access prototypal properties and object-like behaviour. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
+When attempting to access a prototype property on a literal, JavaScript coerces the primitive into an object for the operation, giving temporary access to prototypal properties and object-like behaviour. As soon as the operation is completed these properties are garbage collected and the variable is restored to a primitive value. 
 
 ```javascript
 // primitive
@@ -89,7 +89,7 @@ foo.bar;  // undefined
 
 ### Null and Undefined
 
-Null and Undefined are both types in JavaScript. The difference between the two is simply a case of implict or explicit declaration. Both are meant to represent a yet to be determined value. However, a null value has to be explicitly declared, it does not occur organically, unlike a value of undefined which is automatically assigned to a variable that is declared but not defined.
+Null and Undefined are both types in JavaScript (as of ES6). The difference between the two is simply a case of implict or explicit declaration. Both are meant to represent a yet to be determined value. However, a null value has to be explicitly declared, it does not occur organically, unlike a value of undefined which is automatically assigned to a variable that is declared but not defined.
 
 ```javascript
 // foo is declared but its value is yet to be determined
@@ -102,7 +102,7 @@ foo;  // null
 
 ```
 
-A common source of confusion between the two comes from the result of the <code>typeof</code> operator when used against them. Pre ES6 Undefined is recognised as a type but Null, due to a bug in the ECMAScript implementation, is interpreted as an object.
+A common source of confusion between the two comes from the result of the <code>typeof</code> operator when used against them. Pre ES6 `Undefined` is recognised as a type but `Null`, due to a bug in the ECMAScript implementation, is interpreted as an object.
 
 ```javascript
 var foo;
@@ -110,20 +110,6 @@ typeof foo === "undefined"; // true
 
 var bar = null;
 typeof bar === "object"; // true
-
-```
-
-Pre ES6, null was the only way to declare properties of objects that were yet to be defined.
-
-```javascript
-// Pre ES6, a yet to be determined value within an object
-var foo = { bar : null };
-foo.bar;  // null
-
-// ES6 via object destructuring
-var bar;
-var foo = { bar };
-foo.bar;  // undefined
 
 ```
 
@@ -139,7 +125,7 @@ typeof obj === "function"; // true
 
 ```
 
-In JavaScript functions and variables are given names to associate them with the objects or values they represent. The names given are often referred to as identifiers or references. It is important to remember whenever dealing with idenitifiers that they point only at values and not at each other. Consider the following example:
+In JavaScript functions and variables are given names to associate them with the objects or values they represent. The names given are often referred to as identifiers, references or assignment targets. It is important to remember whenever dealing with idenitifiers that they point only at values and not at each other. Consider the following example:
 
 ```javascript
 var foo = { name : "bar" };
@@ -150,7 +136,7 @@ foo === bar;  // true
 
 ```
 
-It wouldn't be unreasonable after seeing the above to think that <code>bar</code> is a reference to <code>foo</code> as, firstly we assigned <code>bar</code> to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
+It wouldn't be unreasonable after seeing the above to think that <code>bar</code> is a reference to <code>foo</code> as, firstly we assigned <code>bar</code> to be equal to <code>foo</code>, secondly it has access to a property on <code>foo</code> and a strict equality check between the two returns true. This isn't the case though. By assigning <code>bar</code> to <code>foo</code> we've just pointed another identifier to wherever the object value of <code>foo</code> is held in memory. Therefore any comparisons between the two are comparing the same value in memory. Consider the following:
 
 ```javascript
 // re-assign `foo` to a new object
@@ -164,6 +150,37 @@ foo === bar;  // false
 ```
 
 Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's a concept often not fully appreciated and is worth highlighting.
+
+One thing to note with assignment targets is, as of ES6 with the introduction of `let` and `const` as new ways to declare variables beyond `var` is that stricter rules have been introduced with regards to re-assignment. 
+
+```javascript
+// can redclare with or without using var again
+var a = 1;
+var a = 2;
+a;  // 2
+
+// cannot redeclare using let and const 
+let b = 1;
+let b = 2; // Error: Identifier 'b' has already been declared
+
+let c = 1;
+c = 2;
+c;  // 2
+
+// const cannot modify immediate value in any scenario
+const c = 1;
+c = 2;  // Error: Assignment to constant variable
+
+// can alter non-immediate values of a const though
+const d = = { a : 1 };
+d.a = 2;
+d;  // { a : 2 }
+
+const e = [1, 2, 3];
+e[1] = 4;
+e;  // [1, 4, 3]
+
+```
 
 ### Mutation
 

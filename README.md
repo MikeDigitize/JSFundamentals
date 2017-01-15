@@ -151,7 +151,7 @@ foo === bar;  // false
 
 Assigning the <code>foo</code> identifier to another object in memory does not affect <code>bar</code> which still points to the original value of <code>foo</code>. This may all seem fairly obvious but it's a concept often not fully appreciated and is worth highlighting.
 
-One thing to note with assignment targets is, as of ES6 with the introduction of `let` and `const` as new ways to declare variables beyond `var` is that stricter rules have been introduced with regards to re-assignment. 
+One thing to note with assignment targets is `let` and `const` both have stricter rules than `var` with regards to re-assignment. 
 
 ```javascript
 // can redclare with or without using var again
@@ -167,7 +167,7 @@ let c = 1;
 c = 2;
 c;  // 2
 
-// const cannot modify immediate value in any scenario
+// cannot modify immediate values of const declaration in any scenario
 const c = 1;
 c = 2;  // Error: Assignment to constant variable
 

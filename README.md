@@ -356,7 +356,7 @@ function foo() {
 }
 ```
 
-After the compilation stage the <code>x</code> variable declared with var is hoisted but the <code>y</code> variable declared with let is not. When executed <code>x</code> has been declared but not yet given its value, <code>y</code> however has not been declared and an attempt to access it will throw an error. The area above the let declaration is known as the overly dramatic sounding <code>temporal dead zone</code>.
+After the compilation stage the <code>x</code> variable declared with var is hoisted but the <code>y</code> variable declared with let is not. When executed <code>x</code> has been declared but not yet given its value, <code>y</code> however has not been declared and an attempt to access it will throw an error. The area above the let declaration is known as the dramatic sounding <code>temporal dead zone</code>.
 
 ### Summary
 
